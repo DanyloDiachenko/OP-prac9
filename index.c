@@ -324,9 +324,11 @@ void menu()
         case 5:
         {
             int index;
+
             printf("Enter record index: ");
             scanf("%d", &index);
             readSingleRecord(filename, index);
+            
             break;
         }
         case 6:
@@ -336,7 +338,7 @@ void menu()
             printf("Enter record index to edit: ");
             scanf("%d", &index);
             editRecord(filename, index);
-            
+
             break;
         }
         case 7:
