@@ -332,22 +332,27 @@ void menu()
         case 6:
         {
             int index;
+
             printf("Enter record index to edit: ");
             scanf("%d", &index);
             editRecord(filename, index);
+            
             break;
         }
         case 7:
         {
             int ascending;
+
             printf("Enter 1 for ascending or 0 for descending order: ");
             scanf("%d", &ascending);
             sortRecords(filename, ascending);
+            
             break;
         }
         case 8:
         {
             Record newRecord;
+
             printf("Enter name of the region: ");
             scanf("%49s", newRecord.name);
             printf("Enter area: ");
@@ -355,12 +360,13 @@ void menu()
             printf("Enter population: ");
             scanf("%f", &newRecord.population);
             insertRecord(filename, newRecord);
+
             break;
         }
         case 9:
         {
             int index;
-            
+
             printf("Enter record index to delete: ");
             scanf("%d", &index);
             deleteRecord(filename, index);
