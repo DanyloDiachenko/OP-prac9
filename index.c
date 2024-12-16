@@ -15,6 +15,7 @@ void createFile(const char *filename)
     if (file == NULL)
     {
         printf("Error creating file.\n");
+
         return;
     }
     printf("File '%s' created successfully.\n", filename);
@@ -292,8 +293,8 @@ void menu()
         printf("\nMenu:\n");
         printf("1. Create file\n");
         printf("2. Read file\n");
-        printf("3. Add record\n");
-        printf("4. Delete file\n");
+        printf("3. Delete file\n");
+        printf("4. Add record\n");
         printf("5. Read single record\n");
         printf("6. Edit record\n");
         printf("7. Sort records\n");
@@ -312,10 +313,10 @@ void menu()
             readFile(filename);
             break;
         case 3:
-            addRecord(filename);
+            deleteFile(filename);
             break;
         case 4:
-            deleteFile(filename);
+            addRecord(filename);
             break;
         case 5:
         {
