@@ -27,7 +27,7 @@ void createFile(const char *filename)
 void readFile(const char *filename)
 {
     FILE *file = fopen(filename, "rb");
-    
+
     if (file == NULL)
     {
         printf("Error opening file or file does not exist.\n");
@@ -360,13 +360,16 @@ void menu()
         case 9:
         {
             int index;
+            
             printf("Enter record index to delete: ");
             scanf("%d", &index);
             deleteRecord(filename, index);
+
             break;
         }
         case 0:
             printf("Exiting program.\n");
+
             break;
         default:
             printf("Invalid choice. Please try again.\n");
