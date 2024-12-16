@@ -18,13 +18,16 @@ void createFile(const char *filename)
 
         return;
     }
+
     printf("File '%s' created successfully.\n", filename);
+
     fclose(file);
 }
 
 void readFile(const char *filename)
 {
     FILE *file = fopen(filename, "rb");
+    
     if (file == NULL)
     {
         printf("Error opening file or file does not exist.\n");
