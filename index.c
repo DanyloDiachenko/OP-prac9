@@ -238,7 +238,6 @@ void insertRecord(const char *filename, Record newRecord)
 void deleteRecord(const char *filename, int index)
 {
     FILE *file = fopen(filename, "rb");
-    
     if (file == NULL)
     {
         printf("Error opening file or file does not exist.\n");
