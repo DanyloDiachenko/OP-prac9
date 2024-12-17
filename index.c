@@ -328,7 +328,7 @@ void menu()
             printf("Enter record index: ");
             scanf("%d", &index);
             readSingleRecord(filename, index);
-            
+
             break;
         }
         case 6:
@@ -348,7 +348,7 @@ void menu()
             printf("Enter 1 for ascending or 0 for descending order: ");
             scanf("%d", &ascending);
             sortRecords(filename, ascending);
-            
+
             break;
         }
         case 8:
@@ -388,5 +388,6 @@ void menu()
 int main()
 {
     menu();
+
     return 0;
 }
