@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <string.h>
+#include <unistd.h>
 
 typedef struct
 {
@@ -9,18 +12,55 @@ typedef struct
     float population;
 } Record;
 
-void createFile(const char *filename)
+int isValidFileName(const char *filename)
 {
-    FILE *file = fopen(filename, "wb");
-    if (file == NULL)
+    for (int i = 0; filename[i] != '\0'; i++)
     {
-        printf("Error creating file.\n");
-
-        return;
+        if (!isalnum(filename[i]) && filename[i] != '.')
+        {
+            return 0;
+        }
     }
+    return 1;
+}
+
+void createFile()
+{
+    char filename[256];
+    int valid;
+    FILE *file;
+
+    do
+    {
+        printf("Enter the name of the file to create (letters and numbers only): ");
+        scanf("%255s", filename);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name. Only letters, numbers, and dots are allowed.\n");
+            continue;
+        }
+
+        if (access(filename, F_OK) == 0)
+        {
+            printf("File '%s' already exists. Please choose a different name.\n", filename);
+            valid = 0;
+            continue;
+        }
+
+        file = fopen(filename, "wb");
+        if (file == NULL)
+        {
+            printf("Error creating file. Please try again.\n");
+            valid = 0;
+        }
+    } while (!valid);
+
+    const char *signature = "MY_SIGNATURE";
+    fwrite(signature, sizeof(char), strlen(signature), file);
 
     printf("File '%s' created successfully.\n", filename);
-
     fclose(file);
 }
 
