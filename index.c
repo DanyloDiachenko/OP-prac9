@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -27,13 +28,14 @@ int isValidFileName(const char *filename)
 void createFile()
 {
     char filename[256];
-    int valid;
+    bool valid;
     FILE *file;
 
     do
     {
         printf("Enter the name of the file to create (letters and numbers only): ");
         scanf("%255s", filename);
+        fflush(stdin);
 
         valid = isValidFileName(filename);
         if (!valid)
@@ -45,7 +47,7 @@ void createFile()
         if (access(filename, F_OK) == 0)
         {
             printf("File '%s' already exists. Please choose a different name.\n", filename);
-            valid = 0;
+            valid = false;
             continue;
         }
 
@@ -53,7 +55,7 @@ void createFile()
         if (file == NULL)
         {
             printf("Error creating file. Please try again.\n");
-            valid = 0;
+            valid = false;
         }
     } while (!valid);
 
@@ -64,15 +66,40 @@ void createFile()
     fclose(file);
 }
 
-void readFile(const char *filename)
+void readFile()
 {
-    FILE *file = fopen(filename, "rb");
+    char filename[256];
+    bool valid;
+    FILE *file;
 
-    if (file == NULL)
-    {
-        printf("Error opening file or file does not exist.\n");
-        return;
-    }
+    do {
+        printf("Enter the name of the file to read: ");
+        scanf("%255s", filename);
+        fflush(stdin);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name.\n");
+            continue;
+        }
+
+        file = fopen(filename, "rb");
+        if (file == NULL)
+        {
+            printf("Error opening file or file does not exist.\n");
+            valid = false;
+        }
+
+        const int signatureLength = 11;
+        char signature[signatureLength];
+        if (signature != "MY_SIGNATURE")
+        {
+            printf("Invalid file format.\n");
+            fclose(file);
+            return;
+        }
+    } while(!valid);
 
     Record record;
     printf("\nRecords in file:\n");
@@ -84,7 +111,7 @@ void readFile(const char *filename)
     fclose(file);
 }
 
-void addRecord(const char *filename)
+void addRecord()
 {
     FILE *file = fopen(filename, "ab");
     if (file == NULL)
@@ -350,7 +377,7 @@ void menu()
         switch (choice)
         {
         case 1:
-            createFile(filename);
+            createFile();
             break;
         case 2:
             readFile(filename);
