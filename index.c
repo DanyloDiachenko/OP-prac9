@@ -262,6 +262,13 @@ void readSingleRecord()
             fclose(file);
             return;
         }
+    } while (!valid);
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+    {
+        printf("Error opening file or file does not exist.\n");
+        return;
     }
 
     do
@@ -275,13 +282,6 @@ void readSingleRecord()
         }
         fflush(stdin);
     } while (!valid);
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        printf("Error opening file or file does not exist.\n");
-        return;
-    }
 
     Record record;
     fseek(file, index * sizeof(Record), SEEK_SET);
