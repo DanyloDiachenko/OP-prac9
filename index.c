@@ -72,7 +72,8 @@ void readFile()
     bool valid;
     FILE *file;
 
-    do {
+    do
+    {
         printf("Enter the name of the file to read: ");
         scanf("%255s", filename);
         fflush(stdin);
@@ -99,7 +100,7 @@ void readFile()
             fclose(file);
             return;
         }
-    } while(!valid);
+    } while (!valid);
 
     Record record;
     printf("\nRecords in file:\n");
@@ -113,20 +114,78 @@ void readFile()
 
 void addRecord()
 {
-    FILE *file = fopen(filename, "ab");
-    if (file == NULL)
+    char filename[256];
+    bool valid;
+    FILE *file;
+
+    do
     {
-        printf("Error opening file.\n");
-        return;
-    }
+        printf("Enter the name of the file to add record: ");
+        scanf("%255s", filename);
+        fflush(stdin);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name.\n");
+            continue;
+        }
+
+        file = fopen(filename, "ab");
+        if (file == NULL)
+        {
+            printf("Error opening file or file does not exist.\n");
+            valid = false;
+        }
+
+        const int signatureLength = 11;
+        char signature[signatureLength];
+        if (signature != "MY_SIGNATURE")
+        {
+            printf("Invalid file format.\n");
+            fclose(file);
+            return;
+        }
+    } while (!valid);
+    valid = false;
 
     Record record;
-    printf("Enter name of the region: ");
-    scanf("%49s", record.name);
-    printf("Enter area: ");
-    scanf("%f", &record.area);
-    printf("Enter population: ");
-    scanf("%f", &record.population);
+
+    do
+    {
+        printf("Enter name of the region: ");
+
+        if (scanf("%49s", record.name) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            fflush(stdin);
+            valid = false;
+            continue;
+        }
+        fflush(stdin);
+
+        printf("Enter area: ");
+        if (scanf("%f", &record.area) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            fflush(stdin);
+            valid = false;
+            continue;
+        }
+        fflush(stdin);
+
+        printf("Enter population: ");
+        if (scanf("%d", &record.population) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            fflush(stdin);
+            valid = false;
+            continue;
+        }
+        fflush(stdin);
+
+        valid = true;
+    } while (!valid);
 
     fwrite(&record, sizeof(Record), 1, file);
     printf("Record added successfully.\n");
