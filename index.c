@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <errno.h>
 
 typedef struct
 {
@@ -13,16 +14,20 @@ typedef struct
     float population;
 } Record;
 
-int isValidFileName(const char *filename)
+bool isValidFileName(const char *filename)
 {
+    if (strlen(filename) == 0 || strlen(filename) > 255)
+        return 0;
+
     for (int i = 0; filename[i] != '\0'; i++)
     {
-        if (!isalnum(filename[i]) && filename[i] != '.')
+        if (!isalnum(filename[i]) && filename[i] != '.' && filename[i] != '_' && filename[i] != '-')
         {
-            return 0;
+            return false;
         }
     }
-    return 1;
+
+    return true;
 }
 
 void createFile()
@@ -33,14 +38,23 @@ void createFile()
 
     do
     {
-        printf("Enter the name of the file to create (letters and numbers only): ");
-        scanf("%255s", filename);
-        fflush(stdin);
+        printf("Enter the name of the file to create (letters, numbers, dots, underscores, and hyphens only): ");
+        if (fgets(filename, sizeof(filename), stdin) == NULL)
+        {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+
+        size_t len = strlen(filename);
+        if (len > 0 && filename[len - 1] == '\n')
+        {
+            filename[len - 1] = '\0';
+        }
 
         valid = isValidFileName(filename);
         if (!valid)
         {
-            printf("Invalid file name. Only letters, numbers, and dots are allowed.\n");
+            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
@@ -54,15 +68,21 @@ void createFile()
         file = fopen(filename, "wb");
         if (file == NULL)
         {
-            printf("Error creating file. Please try again.\n");
+            printf("Error creating file: %s\n", strerror(errno));
             valid = false;
         }
     } while (!valid);
 
     const char *signature = "MY_SIGNATURE";
-    fwrite(signature, sizeof(char), strlen(signature), file);
+    if (fwrite(signature, sizeof(char), strlen(signature), file) != strlen(signature))
+    {
+        printf("Error writing to file.\n");
+    }
+    else
+    {
+        printf("File '%s' created successfully.\n", filename);
+    }
 
-    printf("File '%s' created successfully.\n", filename);
     fclose(file);
 }
 
@@ -75,122 +95,69 @@ void readFile()
     do
     {
         printf("Enter the name of the file to read: ");
-        scanf("%255s", filename);
-        fflush(stdin);
+        if (fgets(filename, sizeof(filename), stdin) == NULL)
+        {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+
+        size_t len = strlen(filename);
+        if (len > 0 && filename[len - 1] == '\n')
+        {
+            filename[len - 1] = '\0';
+        }
 
         valid = isValidFileName(filename);
         if (!valid)
         {
-            printf("Invalid file name.\n");
+            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
         file = fopen(filename, "rb");
         if (file == NULL)
         {
-            printf("Error opening file or file does not exist.\n");
+            printf("Error opening file or file does not exist: %s\n", strerror(errno));
             valid = false;
-        }
-
-        const int signatureLength = 11;
-        char signature[signatureLength];
-        if (signature != "MY_SIGNATURE")
-        {
-            printf("Invalid file format.\n");
-            fclose(file);
-            return;
         }
     } while (!valid);
 
+    const int signatureLength = 12;
+    char signature[signatureLength];
+    if (fread(signature, sizeof(char), signatureLength - 1, file) != signatureLength - 1)
+    {
+        printf("Error reading file signature.\n");
+        fclose(file);
+        return;
+    }
+    signature[signatureLength - 1] = '\0';
+
+    if (strcmp(signature, "MY_SIGNATURE") != 0)
+    {
+        printf("Invalid file format.\n");
+        fclose(file);
+        return;
+    }
+
     Record record;
     printf("\nRecords in file:\n");
-    while (fread(&record, sizeof(Record), 1, file))
+    while (fread(&record, sizeof(Record), 1, file) == 1)
     {
         printf("Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
+    }
+
+    if (feof(file))
+    {
+        printf("End of file reached.\n");
+    }
+    else
+    {
+        printf("Error reading file.\n");
     }
 
     fclose(file);
 }
 
-void addRecord()
-{
-    char filename[256];
-    bool valid;
-    FILE *file;
-
-    do
-    {
-        printf("Enter the name of the file to add record: ");
-        scanf("%255s", filename);
-        fflush(stdin);
-
-        valid = isValidFileName(filename);
-        if (!valid)
-        {
-            printf("Invalid file name.\n");
-            continue;
-        }
-
-        file = fopen(filename, "ab");
-        if (file == NULL)
-        {
-            printf("Error opening file or file does not exist.\n");
-            valid = false;
-        }
-
-        const int signatureLength = 11;
-        char signature[signatureLength];
-        if (signature != "MY_SIGNATURE")
-        {
-            printf("Invalid file format.\n");
-            fclose(file);
-            return;
-        }
-    } while (!valid);
-    valid = false;
-
-    Record record;
-
-    do
-    {
-        printf("Enter name of the region: ");
-
-        if (scanf("%49s", record.name) != 1)
-        {
-            printf("Invalid input. Please try again.\n");
-            fflush(stdin);
-            valid = false;
-            continue;
-        }
-        fflush(stdin);
-
-        printf("Enter area: ");
-        if (scanf("%f", &record.area) != 1)
-        {
-            printf("Invalid input. Please try again.\n");
-            fflush(stdin);
-            valid = false;
-            continue;
-        }
-        fflush(stdin);
-
-        printf("Enter population: ");
-        if (scanf("%d", &record.population) != 1)
-        {
-            printf("Invalid input. Please try again.\n");
-            fflush(stdin);
-            valid = false;
-            continue;
-        }
-        fflush(stdin);
-
-        valid = true;
-    } while (!valid);
-
-    fwrite(&record, sizeof(Record), 1, file);
-    printf("Record added successfully.\n");
-    fclose(file);
-}
 
 void deleteFile()
 {
