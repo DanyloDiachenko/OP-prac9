@@ -352,7 +352,7 @@ void editRecord()
     if (fread(&record, sizeof(Record), 1, file))
     {
         printf("Editing record at index %d:\n", index);
-        printf("Current Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
+        printf("Current Name: %s, Area: %.2f, Population: %f\n", record.name, record.area, record.population);
 
         printf("Enter new name: ");
 
