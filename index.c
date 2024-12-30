@@ -225,17 +225,57 @@ void deleteFile()
         {
             printf("Error deleting file.\n");
         }
-    } while(!valid);
+    } while (!valid);
 }
 
 void readSingleRecord()
 {
     int index;
     bool valid;
-    
+    char filename[256];
 
-    printf("Enter record index: ");
-    scanf("%d", &index);
+    do
+    {
+        printf("Enter the name of the file to read: ");
+        scanf("%255s", filename);
+        fflush(stdin);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name.\n");
+            continue;
+        }
+
+        FILE *file = fopen(filename, "rb");
+        if (file == NULL)
+        {
+            printf("Error opening file or file does not exist.\n");
+            valid = false;
+        }
+
+        const int signatureLength = 11;
+        char signature[signatureLength];
+        if (signature != "MY_SIGNATURE")
+        {
+            printf("Invalid file format.\n");
+            fclose(file);
+            return;
+        }
+    }
+
+    do
+    {
+        if (scanf("%d", &index) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            fflush(stdin);
+            valid = false;
+            continue;
+        }
+        fflush(stdin);
+    } while (!valid);
+
     FILE *file = fopen(filename, "rb");
     if (file == NULL)
     {
