@@ -297,14 +297,55 @@ void readSingleRecord()
     fclose(file);
 }
 
-void editRecord(const char *filename, int index)
+void editRecord()
 {
-    FILE *file = fopen(filename, "r+b");
-    if (file == NULL)
+    int index;
+    bool valid;
+    char filename[256];
+    FILE *file;
+
+    do
     {
-        printf("Error opening file or file does not exist.\n");
-        return;
-    }
+        printf("Enter the name of the file to read: ");
+        scanf("%255s", filename);
+        fflush(stdin);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name.\n");
+            continue;
+        }
+
+        FILE *file = fopen(filename, "rb");
+        if (file == NULL)
+        {
+            printf("Error opening file or file does not exist.\n");
+            valid = false;
+        }
+
+        const int signatureLength = 11;
+        char signature[signatureLength];
+        if (signature != "MY_SIGNATURE")
+        {
+            printf("Invalid file format.\n");
+            fclose(file);
+            return;
+        }
+    } while (!valid);
+
+    do
+    {
+        printf("Enter record index to edit: ");
+        if (scanf("%d", &index) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            fflush(stdin);
+            valid = false;
+            continue;
+        }
+        fflush(stdin);
+    } while (!valid);
 
     Record record;
     fseek(file, index * sizeof(Record), SEEK_SET);
@@ -314,11 +355,44 @@ void editRecord(const char *filename, int index)
         printf("Current Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
 
         printf("Enter new name: ");
-        scanf("%49s", record.name);
-        printf("Enter new area: ");
-        scanf("%f", &record.area);
-        printf("Enter new population: ");
-        scanf("%f", &record.population);
+
+        do
+        {
+            if (scanf("%49s", record.name) != 1)
+            {
+                printf("Invalid input. Please try again.\n");
+                fflush(stdin);
+                valid = false;
+                continue;
+            }
+            fflush(stdin);
+
+            if (strlen(record.name) > 50)
+            {
+                printf("Name is too long. Please enter a name with at most 50 characters.\n");
+                valid = false;
+                continue;
+            }
+
+            printf("Enter new area: ");
+            if (scanf("%f", record.area) != 1)
+            {
+                printf("Invalid input. Please try again.\n");
+                fflush(stdin);
+                valid = false;
+                continue;
+            }
+            fflush(stdin);
+
+            if (scanf("%d", record.population) != 1)
+            {
+                printf("Invalid input. Please try again.\n");
+                fflush(stdin);
+                valid = false;
+                continue;
+            }
+            fflush(stdin);
+        } while (!valid);
 
         fseek(file, index * sizeof(Record), SEEK_SET);
         fwrite(&record, sizeof(Record), 1, file);
