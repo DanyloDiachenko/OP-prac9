@@ -192,20 +192,50 @@ void addRecord()
     fclose(file);
 }
 
-void deleteFile(const char *filename)
+void deleteFile()
 {
-    if (remove(filename) == 0)
+    char filename[256];
+    bool valid;
+
+    do
     {
-        printf("File '%s' deleted successfully.\n", filename);
-    }
-    else
-    {
-        printf("Error deleting file or file does not exist.\n");
-    }
+        printf("Enter the name of the file to delete: ");
+        scanf("%255s", filename);
+        fflush(stdin);
+
+        valid = isValidFileName(filename);
+        if (!valid)
+        {
+            printf("Invalid file name.\n");
+            continue;
+        }
+
+        if (access(filename, F_OK) != 0)
+        {
+            printf("File '%s' does not exist.\n", filename);
+            valid = false;
+            continue;
+        }
+
+        if (remove(filename) == 0)
+        {
+            printf("File '%s' deleted successfully.\n", filename);
+        }
+        else
+        {
+            printf("Error deleting file.\n");
+        }
+    } while(!valid);
 }
 
-void readSingleRecord(const char *filename, int index)
+void readSingleRecord()
 {
+    int index;
+    bool valid;
+    
+
+    printf("Enter record index: ");
+    scanf("%d", &index);
     FILE *file = fopen(filename, "rb");
     if (file == NULL)
     {
@@ -449,12 +479,7 @@ void menu()
             break;
         case 5:
         {
-            int index;
-
-            printf("Enter record index: ");
-            scanf("%d", &index);
             readSingleRecord(filename, index);
-
             break;
         }
         case 6:
