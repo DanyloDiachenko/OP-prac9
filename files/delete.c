@@ -1,5 +1,3 @@
-#include "../includes.h"
-
 void deleteFile()
 {
     char filename[256];

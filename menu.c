@@ -1,5 +1,3 @@
-#include "./includes.h"
-
 void menu()
 {
     int choice;

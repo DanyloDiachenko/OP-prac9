@@ -1,5 +1,3 @@
-#include "../includes.h"
-
 void readFile()
 {
     char filename[256];

@@ -1,5 +1,3 @@
-#include "../includes.h"
-
 void updateRecord()
 {
     char filename[256];

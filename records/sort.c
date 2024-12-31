@@ -1,5 +1,3 @@
-#include "../includes.h"
-
 void sortRecords()
 {
     char filename[256];

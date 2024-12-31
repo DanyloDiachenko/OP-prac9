@@ -1,5 +1,3 @@
-#include "../includes.h"
-
 void insertRecord()
 {
     char filename[256];
@@ -19,7 +17,7 @@ void insertRecord()
         filename[len - 1] = '\0';
     }
 
-    if (!isValidFileName(filename))
+    if (!validateFileName(filename))
     {
         printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
         return;

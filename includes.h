@@ -10,6 +10,7 @@
 #include <errno.h>
 
 #include "./constants.h"
+#include "./functions.h"
 #include "./menu.c"
 
 #include "./files/create.c"
