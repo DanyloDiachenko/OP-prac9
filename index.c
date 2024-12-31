@@ -383,11 +383,9 @@ void readSingleRecord() {
 
     fseek(file, 12, SEEK_SET);  // Пропускаем 12 байт сигнатуры
 
-    long fileSize = ftell(file);
-    long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
     // Запрос индекса записи
     do {
-        printf("Enter the index of the record to read (file contains %L): ", recordCount);
+        printf("Enter the index of the record to read: ");
         if (scanf("%d", &index) != 1 || index < 0) {
             printf("Invalid input. Index must be a non-negative integer.\n");
             fflush(stdin);
@@ -397,6 +395,8 @@ void readSingleRecord() {
         fflush(stdin);
 
         fseek(file, 0, SEEK_END);
+        long fileSize = ftell(file);
+        long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
 
         if (index >= recordCount) {
             printf("Index out of bounds. File contains %ld records.\n", recordCount);
