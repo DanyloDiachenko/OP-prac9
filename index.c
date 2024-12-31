@@ -355,7 +355,6 @@ void readSingleRecord() {
         const int signatureLength = strlen(expectedSignature);
         char signature[signatureLength + 1];  // +1 для null-терминатора
 
-        // Считываем сигнатуру из файла
         if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
             printf("Invalid file format or file is corrupted.\n");
             fclose(file);
