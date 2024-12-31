@@ -78,7 +78,7 @@ void sortRecords()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
-    int sortField;
+    int sortField = 0;
     printf("Choose the field to sort by:\n");
     printf("1 - Name\n");
     printf("2 - Area\n");
@@ -91,17 +91,18 @@ void sortRecords()
     }
     fflush(stdin);
 
-    int ascending;
     printf("Choose the sort order:\n");
     printf("1 - Ascending\n");
     printf("2 - Descending\n");
     printf("Enter your choice: ");
-    while (scanf("%d", &ascending) != 1 || (ascending != 1 && ascending != 2))
-    {
-        printf("Invalid choice. Please enter 1 or 2: ");
-        fflush(stdin);
-    }
-    fflush(stdin);
+    unsigned short int ascending = 0;
+    do {
+        if (scanf("%hu", &ascending) != 1 || (ascending != 1 && ascending != 2))
+        {
+            printf("Invalid choice. Please enter 1 or 2: ");
+            fflush(stdin);
+        }
+    } while(ascending != 1 && ascending != 2);
 
     int isAscending = (ascending == 1);
 
@@ -110,17 +111,21 @@ void sortRecords()
         for (int j = 0; j < count - i - 1; j++)
         {
             int condition = 0;
-            if (sortField == 1)
+
+            switch (sortField)
             {
+            case 1:
                 condition = isAscending ? (strcmp(records[j].name, records[j + 1].name) > 0) : (strcmp(records[j].name, records[j + 1].name) < 0);
-            }
-            else if (sortField == 2)
-            {
+                break;
+            case 2:
                 condition = isAscending ? (records[j].area > records[j + 1].area) : (records[j].area < records[j + 1].area);
-            }
-            else if (sortField == 3)
-            {
+                break;
+            case 3:
                 condition = isAscending ? (records[j].population > records[j + 1].population) : (records[j].population < records[j + 1].population);
+                break;
+            default:
+                printf("Invalid sort field.\n");
+                return;
             }
 
             if (condition)

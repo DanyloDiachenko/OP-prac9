@@ -9,7 +9,8 @@ void createFile()
     do
     {
         printf("Enter the name of the file to create (letters, numbers, dots, underscores, and hyphens only) including"
-               " '.dat' extension: ");
+               " '.dat' extension up to %d symbols: ",
+               sizeof(filename));
         if (fgets(filename, sizeof(filename), stdin) == NULL)
         {
             printf("Error reading input. Please try again.\n");

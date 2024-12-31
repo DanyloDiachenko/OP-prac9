@@ -57,10 +57,10 @@ void insertRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
-    printf("Enter name of the region (max 50 characters): ");
-    while (scanf("%49s", newRecord.name) != 1 || strlen(newRecord.name) > 50)
+    printf("Enter name of the region (max %d characters): ", MAX_RECORD_NAME_SIZE);
+    while (scanf("%49s", newRecord.name) != 1 || strlen(newRecord.name) > MAX_RECORD_NAME_SIZE)
     {
-        printf("Invalid input. Name should be at most 50 characters. Try again: ");
+        printf("Invalid input. Name should be at most %d characters. Try again: ", MAX_RECORD_NAME_SIZE);
         fflush(stdin);
     }
     fflush(stdin);

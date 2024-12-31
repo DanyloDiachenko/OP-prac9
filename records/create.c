@@ -60,7 +60,7 @@ void createRecord()
 
     do
     {
-        printf("Enter name of the region (max 50 characters): ");
+        printf("Enter name of the region (max %d characters): ", MAX_RECORD_NAME_SIZE);
         if (fgets(record.name, sizeof(record.name), stdin) == NULL)
         {
             printf("Error reading input. Please try again.\n");
