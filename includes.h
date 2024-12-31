@@ -6,4 +6,5 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#include "./constants.h";
+#include "./constants.h"
+#include "./menu.c"

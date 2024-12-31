@@ -9,7 +9,7 @@ void createFile()
     do
     {
         printf("Enter the name of the file to create (letters, numbers, dots, underscores, and hyphens only) including"
-               " .dat extension: ");
+               " '.dat' extension: ");
         if (fgets(filename, sizeof(filename), stdin) == NULL)
         {
             printf("Error reading input. Please try again.\n");
@@ -44,8 +44,7 @@ void createFile()
         }
     } while (!valid);
 
-    const char *signature = "MY_SIGNATURE";
-    if (fwrite(signature, sizeof(char), strlen(signature), file) != strlen(signature))
+    if (fwrite(MY_SIGNATURE, sizeof(char), strlen(MY_SIGNATURE), file) != strlen(MY_SIGNATURE))
     {
         printf("Error writing to file.\n");
     }

@@ -1,6 +1,11 @@
+#define MY_SIGNATURE "MY_SIGNATURE"
+
+#define RECORD_NAME_SIZE 50
+
 typedef struct
 {
-    char name[50];
+    char name[RECORD_NAME_SIZE];
     float area;
     float population;
 } Record;
+
