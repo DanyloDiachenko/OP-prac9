@@ -33,8 +33,7 @@ void sortRecords()
             continue;
         }
 
-        const char *expectedSignature = "MY_SIGNATURE";
-        const int signatureLength = strlen(expectedSignature);
+        int signatureLength = strlen(MY_SIGNATURE);
         char signature[signatureLength + 1];
 
         if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
@@ -46,7 +45,7 @@ void sortRecords()
         }
         signature[signatureLength] = '\0';
 
-        if (strcmp(signature, expectedSignature) != 0)
+        if (strcmp(signature, MY_SIGNATURE) != 0)
         {
             printf("Invalid file format.\n");
             fclose(file);
@@ -65,8 +64,8 @@ void sortRecords()
     }
 
     fseek(file, 0, SEEK_END);
-    int count = (ftell(file) - strlen("MY_SIGNATURE")) / sizeof(Record);
-    fseek(file, strlen("MY_SIGNATURE"), SEEK_SET);
+    int count = (ftell(file) - strlen(MY_SIGNATURE)) / sizeof(Record);
+    fseek(file, strlen(MY_SIGNATURE), SEEK_SET);
 
     Record *records = (Record *)malloc(count * sizeof(Record));
     if (records == NULL)
@@ -141,7 +140,7 @@ void sortRecords()
         return;
     }
 
-    fwrite("MY_SIGNATURE", sizeof(char), strlen("MY_SIGNATURE"), file);
+    fwrite(MY_SIGNATURE, sizeof(char), strlen(MY_SIGNATURE), file);
     fwrite(records, sizeof(Record), count, file);
     fclose(file);
     free(records);

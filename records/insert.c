@@ -30,13 +30,12 @@ void insertRecord()
         return;
     }
 
-    const char *expectedSignature = "MY_SIGNATURE";
-    size_t signatureLength = strlen(expectedSignature);
+    size_t signatureLength = strlen(MY_SIGNATURE);
     char fileSignature[signatureLength + 1];
     memset(fileSignature, 0, sizeof(fileSignature));
 
     fread(fileSignature, sizeof(char), signatureLength, file);
-    if (strcmp(fileSignature, expectedSignature) != 0)
+    if (strcmp(fileSignature, MY_SIGNATURE) != 0)
     {
         printf("Invalid file format. Operation aborted.\n");
         fclose(file);
@@ -97,7 +96,7 @@ void insertRecord()
         return;
     }
 
-    fwrite(expectedSignature, sizeof(char), signatureLength, file);
+    fwrite(MY_SIGNATURE, sizeof(char), signatureLength, file);
     fwrite(records, sizeof(Record), count + 1, file);
     fclose(file);
     free(records);
