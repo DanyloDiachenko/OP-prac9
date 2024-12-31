@@ -23,5 +23,6 @@
 #include "./records/readSingle.c"
 #include "./records/sort.c"
 #include "./records/update.c"
+#include "./records/delete.c"
 
 #endif // INCLUDES_H

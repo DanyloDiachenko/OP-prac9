@@ -1,4 +1,4 @@
-bool validateFileName(const char *filename)
+bool validateFileName(char *filename)
 {
     if (strlen(filename) == 0 || strlen(filename) > 255)
         return 0;

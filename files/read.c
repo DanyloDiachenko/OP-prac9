@@ -1,3 +1,5 @@
+#include "../functions.h"
+
 void readFile()
 {
     char filename[256];

@@ -1,3 +1,5 @@
+#include "./functions.h"
+
 void menu()
 {
     int choice;
@@ -42,7 +44,7 @@ void menu()
             deleteFile();
             break;
         case 4:
-            addRecord();
+            createRecord();
             break;
         case 5:
         {
@@ -51,7 +53,7 @@ void menu()
         }
         case 6:
         {
-            editRecord();
+            updateRecord();
             break;
         }
         case 7:

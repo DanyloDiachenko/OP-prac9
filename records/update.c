@@ -19,7 +19,7 @@ void updateRecord()
             filename[len - 1] = '\0';
         }
 
-        valid = isValidFileName(filename);
+        valid = validateFileName(filename);
         if (!valid)
         {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
