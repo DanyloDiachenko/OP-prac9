@@ -4,7 +4,8 @@
 #define MY_SIGNATURE "MY_SIGNATURE"
 
 #define MAX_RECORD_NAME_SIZE 50
-#define MIN_RECORD_NAME_SIZE 0
+#define MAX_RECORD_AREA 1e9
+#define MAX_RECORD_POPULATION 1e12
 
 typedef struct
 {

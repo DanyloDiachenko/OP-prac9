@@ -66,17 +66,17 @@ void insertRecord()
     fflush(stdin);
 
     printf("Enter area (positive number): ");
-    while (scanf("%f", &newRecord.area) != 1 || newRecord.area <= 0)
+    while (scanf("%f", &newRecord.area) != 1 || newRecord.area <= 0 || newRecord.area > MAX_RECORD_AREA)
     {
-        printf("Invalid input. Area must be a positive number. Try again: ");
+        printf("Invalid input. Area must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_AREA);
         fflush(stdin);
     }
     fflush(stdin);
 
     printf("Enter population (positive number): ");
-    while (scanf("%f", &newRecord.population) != 1 || newRecord.population <= 0)
+    while (scanf("%f", &newRecord.population) != 1 || newRecord.population <= 0 || newRecord.population > MAX_RECORD_POPULATION)
     {
-        printf("Invalid input. Population must be a positive number. Try again: ");
+        printf("Invalid input. Population must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_POPULATION);
         fflush(stdin);
     }
     fflush(stdin);

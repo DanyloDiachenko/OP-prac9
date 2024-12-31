@@ -79,9 +79,9 @@ void createRecord()
     do
     {
         printf("Enter area: ");
-        if (scanf("%f", &record.area) != 1 || record.area <= 0)
+        if (scanf("%f", &record.area) != 1 || record.area <= 0 || record.area > MAX_RECORD_AREA)
         {
-            printf("Invalid input. Area must be a positive number.\n");
+            printf("Invalid input. Area must be a positive number and less than or equal to %.2f.\n", MAX_RECORD_AREA);
             fflush(stdin);
         }
         else
@@ -91,12 +91,14 @@ void createRecord()
         fflush(stdin);
     } while (!inputValid);
 
+    inputValid = false;
+
     do
     {
         printf("Enter population: ");
-        if (scanf("%f", &record.population) != 1 || record.population <= 0)
+        if (scanf("%f", &record.population) != 1 || record.population <= 0 || record.population > MAX_RECORD_POPULATION)
         {
-            printf("Invalid input. Population must be a positive number.\n");
+            printf("Invalid input. Population must be a positive number and less than or equal to %.2f.\n", MAX_RECORD_POPULATION);
             fflush(stdin);
         }
         else

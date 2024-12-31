@@ -100,50 +100,51 @@ void updateRecord()
         printf("\nEnter new name: ");
         do
         {
+            printf("Enter name (1-49 characters): ");
             if (fgets(record.name, sizeof(record.name), stdin) == NULL)
             {
                 printf("Invalid input. Please try again.\n");
-                continue;
             }
-
-            size_t len = strlen(record.name);
-            if (len > 0 && record.name[len - 1] == '\n')
+            else
             {
-                record.name[len - 1] = '\0';
-            }
+                size_t len = strlen(record.name);
+                if (len > 0 && record.name[len - 1] == '\n')
+                {
+                    record.name[len - 1] = '\0';
+                }
 
-            if (strlen(record.name) == 0 || strlen(record.name) > 49)
-            {
-                printf("Name is too long or empty. Please enter a valid name (1-49 characters).\n");
-                continue;
+                if (strlen(record.name) > 0 && strlen(record.name) <= 49)
+                {
+                    break;
+                }
+                else
+                {
+                    printf("Name is too long or empty. Please enter a valid name (1-49 characters).\n");
+                }
             }
-
-            break;
-        } while (true);
+        } while (strlen(record.name) == 0 || strlen(record.name) > 49);
 
         printf("Enter new area: ");
         do
         {
-            if (scanf("%f", &record.area) == 1 && record.area > 0)
+            printf("Enter a positive number for area (≤ %.2f): ", MAX_RECORD_AREA);
+            if (scanf("%f", &record.area) != 1 || record.area <= 0 || record.area > MAX_RECORD_AREA)
             {
+                printf("Invalid input. Area must be a positive number and ≤ %.2f.\n", MAX_RECORD_AREA);
                 fflush(stdin);
-                break;
             }
-            printf("Invalid input. Area must be a positive number. Try again: ");
-            fflush(stdin);
-        } while (record.area <= 0);
+        } while (record.area <= 0 || record.area > MAX_RECORD_AREA);
 
         printf("Enter new population: ");
         do
         {
-            if (scanf("%f", &record.population) == 1 && record.population > 0)
+            printf("Enter a positive number for population (≤ %.2f): ", MAX_RECORD_POPULATION);
+            if (scanf("%f", &record.population) != 1 || record.population <= 0 || record.population > MAX_RECORD_POPULATION)
             {
+                printf("Invalid input. Population must be a positive number and ≤ %.2f.\n", MAX_RECORD_POPULATION);
                 fflush(stdin);
-                break;
             }
-            printf("Invalid input. Population must be a positive number. Try again: ");
-            fflush(stdin);
-        } while (record.population <= 0);
+        } while (record.population <= 0 || record.population > MAX_RECORD_POPULATION);
 
         fseek(file, 12 + index * sizeof(Record), SEEK_SET);
         if (fwrite(&record, sizeof(Record), 1, file) == 1)
