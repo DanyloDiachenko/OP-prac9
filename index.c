@@ -277,20 +277,39 @@ void deleteFile()
         size_t len = strlen(filename);
         if (len > 0 && filename[len - 1] == '\n')
         {
-            filename[len - 1] = '\0';
+            filename[len - 1] = '\0'; // Удаляем символ новой строки
         }
 
         valid = isValidFileName(filename);
         if (!valid)
         {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
+            printf("Invalid file name. Only letters, numbers, and dots are allowed.\n");
             continue;
         }
 
         if (access(filename, F_OK) != 0)
         {
             printf("File '%s' does not exist.\n", filename);
-            valid = false;
+            continue;
+        }
+
+        FILE *file = fopen(filename, "rb");
+        if (file == NULL)
+        {
+            printf("Error opening file: %s\n", strerror(errno));
+            continue;
+        }
+
+        size_t signatureLength = strlen("MY_SIGNATURE");
+        char fileSignature[signatureLength + 1];
+        memset(fileSignature, 0, sizeof(fileSignature));
+
+        fread(fileSignature, sizeof(char), signatureLength, file);
+        fclose(file);
+
+        if (strcmp(fileSignature, "MY_SIGNATURE") != 0)
+        {
+            printf("File '%s' is not recognized as a valid file. It will not be deleted.\n", filename);
             continue;
         }
 
@@ -585,58 +604,7 @@ void editRecord()
 
 // end
 
-void sortRecords(const char *filename, int ascending)
-{
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        printf("Error opening file or file does not exist.\n");
-        return;
-    }
-
-    fseek(file, 0, SEEK_END);
-    int count = ftell(file) / sizeof(Record);
-    fseek(file, 0, SEEK_SET);
-
-    Record *records = (Record *)malloc(count * sizeof(Record));
-    if (records == NULL)
-    {
-        printf("Memory allocation error.\n");
-        fclose(file);
-        return;
-    }
-
-    fread(records, sizeof(Record), count, file);
-    fclose(file);
-
-    for (int i = 0; i < count - 1; i++)
-    {
-        for (int j = 0; j < count - i - 1; j++)
-        {
-            int condition = ascending ? (strcmp(records[j].name, records[j + 1].name) > 0) : (strcmp(records[j].name, records[j + 1].name) < 0);
-            if (condition)
-            {
-                Record temp = records[j];
-                records[j] = records[j + 1];
-                records[j + 1] = temp;
-            }
-        }
-    }
-
-    file = fopen(filename, "wb");
-    if (file == NULL)
-    {
-        printf("Error opening file for writing.\n");
-        free(records);
-        return;
-    }
-
-    fwrite(records, sizeof(Record), count, file);
-    fclose(file);
-    free(records);
-
-    printf("Records sorted %s successfully.\n", ascending ? "in ascending order" : "in descending order");
-}
+//
 
 void insertRecord(const char *filename, Record newRecord)
 {
