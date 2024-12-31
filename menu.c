@@ -12,7 +12,7 @@ void menu()
         printf("3. Delete file\n");
         printf("4. Add record\n");
         printf("5. Read single record\n");
-        printf("6. Edit record\n");
+        printf("6. Update record\n");
         printf("7. Sort records\n");
         printf("8. Insert record\n");
         printf("9. Delete record\n");
