@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.svg": "javascriptreact",
-        "includes.h": "c"
+        "includes.h": "c",
+        "constants.h": "c"
     }
 }
