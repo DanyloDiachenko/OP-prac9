@@ -38,14 +38,14 @@ void deleteFile()
             continue;
         }
 
-        size_t signatureLength = strlen("MY_SIGNATURE");
+        size_t signatureLength = strlen(MY_SIGNATURE);
         char fileSignature[signatureLength + 1];
         memset(fileSignature, 0, sizeof(fileSignature));
 
         fread(fileSignature, sizeof(char), signatureLength, file);
         fclose(file);
 
-        if (strcmp(fileSignature, "MY_SIGNATURE") != 0)
+        if (strcmp(fileSignature, MY_SIGNATURE) != 0)
         {
             printf("File '%s' is not recognized as a valid file. It will not be deleted.\n", filename);
             continue;
