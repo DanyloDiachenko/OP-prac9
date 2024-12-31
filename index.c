@@ -383,34 +383,35 @@ void readSingleRecord() {
 
     fseek(file, 12, SEEK_SET);  // Пропускаем 12 байт сигнатуры
 
+    // Получаем количество записей
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
+
+    printf("The file contains %ld records.\n", recordCount);
+
     // Запрос индекса записи
     do {
-        printf("Enter the index of the record to read: ");
-        if (scanf("%d", &index) != 1 || index < 0) {
-            printf("Invalid input. Index must be a non-negative integer.\n");
+        printf("Enter the index of the record to read (1-%ld): ", recordCount);
+        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount) {
+            printf("Invalid input. Index must be a non-negative integer between 1 and %ld.\n", recordCount);
             fflush(stdin);
             valid = false;
             continue;
         }
         fflush(stdin);
 
-        fseek(file, 0, SEEK_END);
-        long fileSize = ftell(file);
-        long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
-
-        if (index >= recordCount) {
-            printf("Index out of bounds. File contains %ld records.\n", recordCount);
-            valid = false;
-        } else {
-            valid = true;
-        }
+        valid = true;
     } while (!valid);
+
+    // Индексация в файле начинается с 0, поэтому уменьшаем индекс на 1
+    index -= 1;
 
     // Чтение записи по индексу
     Record record;
     fseek(file, 12 + index * sizeof(Record), SEEK_SET); // Позиционируем указатель на нужную запись
     if (fread(&record, sizeof(Record), 1, file) == 1) {
-        printf("\nRecord at index %d:\n", index);
+        printf("\nRecord at index %d:\n", index + 1);  // Выводим индекс с учетом пользовательской индексации
         printf("Name: %s\nArea: %.2f\nPopulation: %.2f\n", record.name, record.area, record.population);
     } else {
         printf("Error reading record at index %d.\n", index);
