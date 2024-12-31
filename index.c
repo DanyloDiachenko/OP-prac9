@@ -884,13 +884,17 @@ void deleteRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
-    printf("Enter the index of the record to delete (0 to %d): ", count - 1);
-    while (scanf("%d", &index) != 1 || index < 0 || index >= count)
+    // Изменяем вывод так, чтобы индексация начиналась с 1
+    printf("Enter the index of the record to delete (1 to %d): ", count);  // Индексация от 1
+    while (scanf("%d", &index) != 1 || index < 1 || index > count)  // Ввод индекса от 1 до count
     {
-        printf("Invalid input. Index must be between 0 and %d. Try again: ", count - 1);
+        printf("Invalid input. Index must be between 1 and %d. Try again: ", count);
         fflush(stdin);
     }
     fflush(stdin);
+
+    // Преобразуем индекс пользователя в индекс для массива (индексация с 0)
+    index--;  // Уменьшаем на 1, чтобы работать с индексами массива (начиная с 0)
 
     for (int i = index; i < count - 1; i++)
     {
@@ -898,6 +902,7 @@ void deleteRecord()
     }
 
     file = fopen(filename, "wb");
+
     if (file == NULL)
     {
         printf("Error opening file for writing.\n");
@@ -910,7 +915,7 @@ void deleteRecord()
     fclose(file);
     free(records);
 
-    printf("Record at index %d deleted successfully from file '%s'.\n", index, filename);
+    printf("Record at index %d deleted successfully from file '%s'.\n", index + 1, filename);  // Выводим индекс с 1
 }
 
 void menu()
