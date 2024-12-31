@@ -420,124 +420,114 @@ void readSingleRecord() {
     fclose(file);
 }
 
-void editRecord()
-{
+void editRecord() {
     char filename[256];
     bool valid;
     int index;
 
-    do
-    {
+    do {
         printf("Enter the name of the file to edit: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
+        if (fgets(filename, sizeof(filename), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
+        // Убираем символ новой строки, если он есть
         size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
+        if (len > 0 && filename[len - 1] == '\n') {
             filename[len - 1] = '\0';
         }
 
         valid = isValidFileName(filename);
-        if (!valid)
-        {
+        if (!valid) {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
         FILE *file = fopen(filename, "rb+");
-        if (file == NULL)
-        {
+        if (file == NULL) {
             printf("Error opening file: %s\n", strerror(errno));
             valid = false;
             continue;
         }
 
-        const int signatureLength = 12;
-        char signature[signatureLength];
-        if (fread(signature, sizeof(char), signatureLength - 1, file) != signatureLength - 1)
-        {
+        const char *expectedSignature = "MY_SIGNATURE";
+        const int signatureLength = strlen(expectedSignature);
+        char signature[signatureLength + 1];  // +1 для null-терминатора
+
+        // Считываем сигнатуру из файла
+        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
             printf("Invalid file format or file is corrupted.\n");
             fclose(file);
             valid = false;
             continue;
         }
-        signature[signatureLength - 1] = '\0';
 
-        if (strcmp(signature, "MY_SIGNATURE") != 0)
-        {
+        signature[signatureLength] = '\0'; // Завершаем строку символом null
+
+        if (strcmp(signature, expectedSignature) != 0) {
             printf("Invalid file format.\n");
             fclose(file);
             valid = false;
             continue;
         }
 
-        fclose(file);
+        fclose(file);  // Закрываем файл после проверки сигнатуры
     } while (!valid);
 
     FILE *file = fopen(filename, "rb+");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         printf("Error opening file: %s\n", strerror(errno));
         return;
     }
 
-    fseek(file, 12, SEEK_SET);
+    fseek(file, 12, SEEK_SET);  // Пропускаем 12 байт сигнатуры
 
-    do
-    {
-        printf("Enter the index of the record to edit: ");
-        if (scanf("%d", &index) != 1 || index < 0)
-        {
-            printf("Invalid input. Index must be a non-negative integer.\n");
+    // Получаем количество записей
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
+
+    printf("The file contains %ld records.\n", recordCount);
+
+    // Запрос индекса записи
+    do {
+        printf("Enter the index of the record to edit (1-%ld): ", recordCount);
+        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount) {
+            printf("Invalid input. Index must be a non-negative integer between 1 and %ld.\n", recordCount);
             fflush(stdin);
             valid = false;
             continue;
         }
         fflush(stdin);
 
-        fseek(file, 0, SEEK_END);
-        long fileSize = ftell(file);
-        long recordCount = (fileSize - 12) / sizeof(Record);
-
-        if (index >= recordCount)
-        {
-            printf("Index out of bounds. File contains %ld records.\n", recordCount);
-            valid = false;
-        }
-        else
-        {
-            valid = true;
-        }
+        valid = true;
     } while (!valid);
 
+    // Индексация в файле начинается с 0, поэтому уменьшаем индекс на 1
+    index -= 1;
+
+    // Чтение записи по индексу
     Record record;
-    fseek(file, 12 + index * sizeof(Record), SEEK_SET);
-    if (fread(&record, sizeof(Record), 1, file) == 1)
-    {
-        printf("\nEditing record at index %d:\n", index);
+    fseek(file, 12 + index * sizeof(Record), SEEK_SET); // Позиционируем указатель на нужную запись
+    if (fread(&record, sizeof(Record), 1, file) == 1) {
+        printf("\nEditing record at index %d:\n", index + 1);  // Выводим индекс с учетом пользовательской индексации
         printf("Current Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
 
+        // Ввод новых данных
         printf("\nEnter new name: ");
-        do
-        {
-            if (fgets(record.name, sizeof(record.name), stdin) == NULL)
-            {
+        do {
+            if (fgets(record.name, sizeof(record.name), stdin) == NULL) {
                 printf("Invalid input. Please try again.\n");
                 continue;
             }
 
             size_t len = strlen(record.name);
-            if (len > 0 && record.name[len - 1] == '\n')
-            {
+            if (len > 0 && record.name[len - 1] == '\n') {
                 record.name[len - 1] = '\0';
             }
 
-            if (strlen(record.name) == 0 || strlen(record.name) > 49)
-            {
+            if (strlen(record.name) == 0 || strlen(record.name) > 49) {
                 printf("Name is too long or empty. Please enter a valid name (1-49 characters).\n");
                 continue;
             }
@@ -546,10 +536,8 @@ void editRecord()
         } while (true);
 
         printf("Enter new area: ");
-        do
-        {
-            if (scanf("%f", &record.area) == 1 && record.area > 0)
-            {
+        do {
+            if (scanf("%f", &record.area) == 1 && record.area > 0) {
                 fflush(stdin);
                 break;
             }
@@ -558,10 +546,8 @@ void editRecord()
         } while (record.area <= 0);
 
         printf("Enter new population: ");
-        do
-        {
-            if (scanf("%f", &record.population) == 1 && record.population > 0)
-            {
+        do {
+            if (scanf("%f", &record.population) == 1 && record.population > 0) {
                 fflush(stdin);
                 break;
             }
@@ -570,17 +556,14 @@ void editRecord()
         } while (record.population <= 0);
 
         fseek(file, 12 + index * sizeof(Record), SEEK_SET);
-        if (fwrite(&record, sizeof(Record), 1, file) == 1)
-        {
+        if (fwrite(&record, sizeof(Record), 1, file) == 1) {
             printf("Record updated successfully.\n");
         }
-        else
-        {
+        else {
             printf("Error updating record.\n");
         }
     }
-    else
-    {
+    else {
         printf("No record found at index %d.\n", index);
     }
 
