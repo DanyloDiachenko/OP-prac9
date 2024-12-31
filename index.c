@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -277,7 +276,7 @@ void deleteFile()
         size_t len = strlen(filename);
         if (len > 0 && filename[len - 1] == '\n')
         {
-            filename[len - 1] = '\0'; // Удаляем символ новой строки
+            filename[len - 1] = '\0';
         }
 
         valid = isValidFileName(filename);
