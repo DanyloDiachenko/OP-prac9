@@ -1,450 +1,37 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <errno.h>
+#include "./includes.h";
 
-typedef struct
+void editRecord()
 {
-    char name[50];
-    float area;
-    float population;
-} Record;
-
-bool isValidFileName(const char *filename)
-{
-    if (strlen(filename) == 0 || strlen(filename) > 255)
-        return 0;
-
-    for (int i = 0; filename[i] != '\0'; i++)
-    {
-        if (!isalnum(filename[i]) && filename[i] != '.' && filename[i] != '_' && filename[i] != '-')
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void createFile()
-{
-    char filename[256];
-    bool valid;
-    FILE *file;
-
-    do
-    {
-        printf("Enter the name of the file to create (letters, numbers, dots, underscores, and hyphens only) including"
-               " .dat extension: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
-            filename[len - 1] = '\0';
-        }
-
-        valid = isValidFileName(filename);
-        if (!valid)
-        {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
-        }
-
-        if (access(filename, F_OK) == 0)
-        {
-            printf("File '%s' already exists. Please choose a different name.\n", filename);
-            valid = false;
-            continue;
-        }
-
-        file = fopen(filename, "wb");
-        if (file == NULL)
-        {
-            printf("Error creating file: %s\n", strerror(errno));
-            valid = false;
-        }
-    } while (!valid);
-
-    const char *signature = "MY_SIGNATURE";
-    if (fwrite(signature, sizeof(char), strlen(signature), file) != strlen(signature))
-    {
-        printf("Error writing to file.\n");
-    }
-    else
-    {
-        printf("File '%s' created successfully.\n", filename);
-    }
-
-    fclose(file);
-}
-
-void readFile() {
-    char filename[256];
-    FILE *file;
-    bool valid;
-
-    do {
-        printf("Enter the name of the file to read: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL) {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n') {
-            filename[len - 1] = '\0';
-        }
-
-        valid = isValidFileName(filename);
-        if (!valid) {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
-        }
-
-        file = fopen(filename, "rb");
-        if (file == NULL) {
-            printf("Error opening file or file does not exist: %s\n", strerror(errno));
-            valid = false;
-        }
-    } while (!valid);
-
-    const char *expectedSignature = "MY_SIGNATURE";
-    const int signatureLength = strlen(expectedSignature);
-    char signature[signatureLength + 1];
-
-    if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
-        printf("Error reading file signature.\n");
-        fclose(file);
-        return;
-    }
-    signature[signatureLength] = '\0';
-
-    if (strcmp(signature, expectedSignature) != 0) {
-        printf("Invalid file format.\n");
-        fclose(file);
-        return;
-    }
-
-    Record record;
-    printf("\nRecords in file:\n");
-    while (fread(&record, sizeof(Record), 1, file) == 1) {
-        printf("Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
-    }
-
-    if (feof(file)) {
-        printf("End of file reached.\n");
-    } else {
-        printf("Error reading file.\n");
-    }
-
-    fclose(file);
-}
-
-void addRecord() {
-    char filename[256];
-    bool valid;
-    FILE *file;
-
-    do {
-        printf("Enter the name of the file to add record: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL) {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        // Удаление символа новой строки
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n') {
-            filename[len - 1] = '\0';
-        }
-
-        // Проверка имени файла
-        valid = isValidFileName(filename);
-        if (!valid) {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
-        }
-
-        // Открытие файла
-        file = fopen(filename, "rb+");
-        if (file == NULL) {
-            printf("Error opening file: %s\n", strerror(errno));
-            valid = false;
-            continue;
-        }
-
-        // Проверка сигнатуры
-        const char *expectedSignature = "MY_SIGNATURE";
-        const int signatureLength = strlen(expectedSignature);
-        char signature[signatureLength + 1]; // +1 для '\0'
-
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
-            printf("Error reading file signature.\n");
-            fclose(file);
-            continue;
-        }
-        signature[signatureLength] = '\0'; // Завершающий символ
-
-        if (strcmp(signature, expectedSignature) != 0) {
-            printf("Invalid file format.\n");
-            fclose(file);
-            continue;
-        }
-
-        // Перемещаем указатель в конец файла для добавления записи
-        fseek(file, 0, SEEK_END);
-    } while (!valid);
-
-    // Заполнение новой записи
-    Record record;
-    bool inputValid = false;
-
-    // Запрос имени региона (процесс повторяется, если ввод неверный)
-    do {
-        printf("Enter name of the region (max 50 characters): ");
-        if (fgets(record.name, sizeof(record.name), stdin) == NULL) {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        size_t len = strlen(record.name);
-        if (len > 0 && record.name[len - 1] == '\n') {
-            record.name[len - 1] = '\0'; // Удаление символа новой строки
-        }
-
-        inputValid = true;
-    } while (!inputValid); // Повторяется, если ввод имени невалиден
-
-    // Запрос площади с проверкой на правильность
-    do {
-        printf("Enter area: ");
-        if (scanf("%f", &record.area) != 1 || record.area <= 0) {
-            printf("Invalid input. Area must be a positive number.\n");
-            fflush(stdin);  // Очищаем буфер ввода
-        } else {
-            inputValid = true;  // Ввод корректен
-        }
-    } while (!inputValid); // Повторяется, если введено неверное значение
-
-    // Запрос населения с проверкой на правильность
-    do {
-        printf("Enter population: ");
-        if (scanf("%f", &record.population) != 1 || record.population <= 0) {
-            printf("Invalid input. Population must be a positive number.\n");
-            fflush(stdin);  // Очищаем буфер ввода
-        } else {
-            inputValid = true;  // Ввод корректен
-        }
-    } while (!inputValid); // Повторяется, если введено неверное значение
-
-    // Запись записи в файл
-    fwrite(&record, sizeof(Record), 1, file);
-    printf("Record added successfully.\n");
-
-    // Закрытие файла
-    fclose(file);
-}
-
-
-void deleteFile()
-{
-    char filename[256];
-    bool valid;
-
-    do
-    {
-        printf("Enter the name of the file to delete: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
-            filename[len - 1] = '\0';
-        }
-
-        valid = isValidFileName(filename);
-        if (!valid)
-        {
-            printf("Invalid file name. Only letters, numbers, and dots are allowed.\n");
-            continue;
-        }
-
-        if (access(filename, F_OK) != 0)
-        {
-            printf("File '%s' does not exist.\n", filename);
-            continue;
-        }
-
-        FILE *file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            printf("Error opening file: %s\n", strerror(errno));
-            continue;
-        }
-
-        size_t signatureLength = strlen("MY_SIGNATURE");
-        char fileSignature[signatureLength + 1];
-        memset(fileSignature, 0, sizeof(fileSignature));
-
-        fread(fileSignature, sizeof(char), signatureLength, file);
-        fclose(file);
-
-        if (strcmp(fileSignature, "MY_SIGNATURE") != 0)
-        {
-            printf("File '%s' is not recognized as a valid file. It will not be deleted.\n", filename);
-            continue;
-        }
-
-        if (remove(filename) == 0)
-        {
-            printf("File '%s' deleted successfully.\n", filename);
-        }
-        else
-        {
-            printf("Error deleting file: %s\n", strerror(errno));
-        }
-
-        valid = true;
-    } while (!valid);
-}
-
-void readSingleRecord() {
     char filename[256];
     bool valid;
     int index;
 
-    do {
-        printf("Enter the name of the file to read: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL) {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        // Убираем символ новой строки, если он есть
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n') {
-            filename[len - 1] = '\0';
-        }
-
-        valid = isValidFileName(filename);
-        if (!valid) {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
-        }
-
-        FILE *file = fopen(filename, "rb");
-        if (file == NULL) {
-            printf("Error opening file: %s\n", strerror(errno));
-            valid = false;
-            continue;
-        }
-
-        const char *expectedSignature = "MY_SIGNATURE";
-        const int signatureLength = strlen(expectedSignature);
-        char signature[signatureLength + 1];  // +1 для null-терминатора
-
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
-            printf("Invalid file format or file is corrupted.\n");
-            fclose(file);
-            valid = false;
-            continue;
-        }
-
-        signature[signatureLength] = '\0'; // Завершаем строку символом null
-
-        if (strcmp(signature, expectedSignature) != 0) {
-            printf("Invalid file format.\n");
-            fclose(file);
-            valid = false;
-            continue;
-        }
-
-        fclose(file);  // Закрываем файл после проверки сигнатуры
-    } while (!valid);
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL) {
-        printf("Error opening file: %s\n", strerror(errno));
-        return;
-    }
-
-    fseek(file, 12, SEEK_SET);  // Пропускаем 12 байт сигнатуры
-
-    // Получаем количество записей
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    long recordCount = (fileSize - 12) / sizeof(Record); // Количество записей
-
-    printf("The file contains %ld records.\n", recordCount);
-
-    // Запрос индекса записи
-    do {
-        printf("Enter the index of the record to read (1-%ld): ", recordCount);
-        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount) {
-            printf("Invalid input. Index must be a non-negative integer between 1 and %ld.\n", recordCount);
-            fflush(stdin);
-            valid = false;
-            continue;
-        }
-        fflush(stdin);
-
-        valid = true;
-    } while (!valid);
-
-    // Индексация в файле начинается с 0, поэтому уменьшаем индекс на 1
-    index -= 1;
-
-    // Чтение записи по индексу
-    Record record;
-    fseek(file, 12 + index * sizeof(Record), SEEK_SET); // Позиционируем указатель на нужную запись
-    if (fread(&record, sizeof(Record), 1, file) == 1) {
-        printf("\nRecord at index %d:\n", index + 1);  // Выводим индекс с учетом пользовательской индексации
-        printf("Name: %s\nArea: %.2f\nPopulation: %.2f\n", record.name, record.area, record.population);
-    } else {
-        printf("Error reading record at index %d.\n", index);
-    }
-
-    fclose(file);
-}
-
-void editRecord() {
-    char filename[256];
-    bool valid;
-    int index;
-
-    do {
+    do
+    {
         printf("Enter the name of the file to edit: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL) {
+        if (fgets(filename, sizeof(filename), stdin) == NULL)
+        {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
         // Убираем символ новой строки, если он есть
         size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n') {
+        if (len > 0 && filename[len - 1] == '\n')
+        {
             filename[len - 1] = '\0';
         }
 
         valid = isValidFileName(filename);
-        if (!valid) {
+        if (!valid)
+        {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
         FILE *file = fopen(filename, "rb+");
-        if (file == NULL) {
+        if (file == NULL)
+        {
             printf("Error opening file: %s\n", strerror(errno));
             valid = false;
             continue;
@@ -452,10 +39,11 @@ void editRecord() {
 
         const char *expectedSignature = "MY_SIGNATURE";
         const int signatureLength = strlen(expectedSignature);
-        char signature[signatureLength + 1];  // +1 для null-терминатора
+        char signature[signatureLength + 1]; // +1 для null-терминатора
 
         // Считываем сигнатуру из файла
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
+        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
+        {
             printf("Invalid file format or file is corrupted.\n");
             fclose(file);
             valid = false;
@@ -464,23 +52,25 @@ void editRecord() {
 
         signature[signatureLength] = '\0'; // Завершаем строку символом null
 
-        if (strcmp(signature, expectedSignature) != 0) {
+        if (strcmp(signature, expectedSignature) != 0)
+        {
             printf("Invalid file format.\n");
             fclose(file);
             valid = false;
             continue;
         }
 
-        fclose(file);  // Закрываем файл после проверки сигнатуры
+        fclose(file); // Закрываем файл после проверки сигнатуры
     } while (!valid);
 
     FILE *file = fopen(filename, "rb+");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error opening file: %s\n", strerror(errno));
         return;
     }
 
-    fseek(file, 12, SEEK_SET);  // Пропускаем 12 байт сигнатуры
+    fseek(file, 12, SEEK_SET); // Пропускаем 12 байт сигнатуры
 
     // Получаем количество записей
     fseek(file, 0, SEEK_END);
@@ -490,9 +80,11 @@ void editRecord() {
     printf("The file contains %ld records.\n", recordCount);
 
     // Запрос индекса записи
-    do {
+    do
+    {
         printf("Enter the index of the record to edit (1-%ld): ", recordCount);
-        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount) {
+        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount)
+        {
             printf("Invalid input. Index must be a non-negative integer between 1 and %ld.\n", recordCount);
             fflush(stdin);
             valid = false;
@@ -509,24 +101,29 @@ void editRecord() {
     // Чтение записи по индексу
     Record record;
     fseek(file, 12 + index * sizeof(Record), SEEK_SET); // Позиционируем указатель на нужную запись
-    if (fread(&record, sizeof(Record), 1, file) == 1) {
-        printf("\nEditing record at index %d:\n", index + 1);  // Выводим индекс с учетом пользовательской индексации
+    if (fread(&record, sizeof(Record), 1, file) == 1)
+    {
+        printf("\nEditing record at index %d:\n", index + 1); // Выводим индекс с учетом пользовательской индексации
         printf("Current Name: %s, Area: %.2f, Population: %.2f\n", record.name, record.area, record.population);
 
         // Ввод новых данных
         printf("\nEnter new name: ");
-        do {
-            if (fgets(record.name, sizeof(record.name), stdin) == NULL) {
+        do
+        {
+            if (fgets(record.name, sizeof(record.name), stdin) == NULL)
+            {
                 printf("Invalid input. Please try again.\n");
                 continue;
             }
 
             size_t len = strlen(record.name);
-            if (len > 0 && record.name[len - 1] == '\n') {
+            if (len > 0 && record.name[len - 1] == '\n')
+            {
                 record.name[len - 1] = '\0';
             }
 
-            if (strlen(record.name) == 0 || strlen(record.name) > 49) {
+            if (strlen(record.name) == 0 || strlen(record.name) > 49)
+            {
                 printf("Name is too long or empty. Please enter a valid name (1-49 characters).\n");
                 continue;
             }
@@ -535,8 +132,10 @@ void editRecord() {
         } while (true);
 
         printf("Enter new area: ");
-        do {
-            if (scanf("%f", &record.area) == 1 && record.area > 0) {
+        do
+        {
+            if (scanf("%f", &record.area) == 1 && record.area > 0)
+            {
                 fflush(stdin);
                 break;
             }
@@ -545,8 +144,10 @@ void editRecord() {
         } while (record.area <= 0);
 
         printf("Enter new population: ");
-        do {
-            if (scanf("%f", &record.population) == 1 && record.population > 0) {
+        do
+        {
+            if (scanf("%f", &record.population) == 1 && record.population > 0)
+            {
                 fflush(stdin);
                 break;
             }
@@ -555,44 +156,53 @@ void editRecord() {
         } while (record.population <= 0);
 
         fseek(file, 12 + index * sizeof(Record), SEEK_SET);
-        if (fwrite(&record, sizeof(Record), 1, file) == 1) {
+        if (fwrite(&record, sizeof(Record), 1, file) == 1)
+        {
             printf("Record updated successfully.\n");
         }
-        else {
+        else
+        {
             printf("Error updating record.\n");
         }
     }
-    else {
+    else
+    {
         printf("No record found at index %d.\n", index);
     }
 
     fclose(file);
 }
 
-void sortRecords() {
+void sortRecords()
+{
     char filename[256];
     bool valid;
 
-    do {
+    do
+    {
         printf("Enter the name of the file to sort: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL) {
+        if (fgets(filename, sizeof(filename), stdin) == NULL)
+        {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
         size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n') {
+        if (len > 0 && filename[len - 1] == '\n')
+        {
             filename[len - 1] = '\0';
         }
 
         valid = isValidFileName(filename);
-        if (!valid) {
+        if (!valid)
+        {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
         FILE *file = fopen(filename, "rb+");
-        if (file == NULL) {
+        if (file == NULL)
+        {
             printf("Error opening file: %s\n", strerror(errno));
             valid = false;
             continue;
@@ -603,7 +213,8 @@ void sortRecords() {
         char signature[signatureLength + 1]; // +1 for null-terminator
 
         // Read the signature from the file
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
+        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
+        {
             printf("Invalid file format or file is corrupted.\n");
             fclose(file);
             valid = false;
@@ -612,19 +223,21 @@ void sortRecords() {
         signature[signatureLength] = '\0'; // Null-terminate the string
 
         // Check if the signature matches
-        if (strcmp(signature, expectedSignature) != 0) {
+        if (strcmp(signature, expectedSignature) != 0)
+        {
             printf("Invalid file format.\n");
             fclose(file);
             valid = false;
             continue;
         }
 
-        fclose(file);  // Close the file after signature check
+        fclose(file); // Close the file after signature check
     } while (!valid);
 
     // Reopen the file for sorting
     FILE *file = fopen(filename, "rb");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error opening file or file does not exist.\n");
         return;
     }
@@ -632,10 +245,11 @@ void sortRecords() {
     // Get the count of records
     fseek(file, 0, SEEK_END);
     int count = (ftell(file) - strlen("MY_SIGNATURE")) / sizeof(Record); // Subtract signature size
-    fseek(file, strlen("MY_SIGNATURE"), SEEK_SET); // Move the pointer after the signature
+    fseek(file, strlen("MY_SIGNATURE"), SEEK_SET);                       // Move the pointer after the signature
 
     Record *records = (Record *)malloc(count * sizeof(Record));
-    if (records == NULL) {
+    if (records == NULL)
+    {
         printf("Memory allocation error.\n");
         fclose(file);
         return;
@@ -651,7 +265,8 @@ void sortRecords() {
     printf("2 - Area\n");
     printf("3 - Population\n");
     printf("Enter your choice: ");
-    while (scanf("%d", &sortField) != 1 || sortField < 1 || sortField > 3) {
+    while (scanf("%d", &sortField) != 1 || sortField < 1 || sortField > 3)
+    {
         printf("Invalid choice. Please enter 1, 2, or 3: ");
         fflush(stdin);
     }
@@ -662,7 +277,8 @@ void sortRecords() {
     printf("1 - Ascending\n");
     printf("2 - Descending\n");
     printf("Enter your choice: ");
-    while (scanf("%d", &ascending) != 1 || (ascending != 1 && ascending != 2)) {
+    while (scanf("%d", &ascending) != 1 || (ascending != 1 && ascending != 2))
+    {
         printf("Invalid choice. Please enter 1 or 2: ");
         fflush(stdin);
     }
@@ -671,19 +287,27 @@ void sortRecords() {
     int isAscending = (ascending == 1);
 
     // Sorting the records
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = 0; j < count - i - 1; j++)
+        {
             int condition = 0;
-            if (sortField == 1) {
+            if (sortField == 1)
+            {
                 condition = isAscending ? (strcmp(records[j].name, records[j + 1].name) > 0) : (strcmp(records[j].name, records[j + 1].name) < 0);
-            } else if (sortField == 2) {
+            }
+            else if (sortField == 2)
+            {
                 condition = isAscending ? (records[j].area > records[j + 1].area) : (records[j].area < records[j + 1].area);
-            } else if (sortField == 3) {
+            }
+            else if (sortField == 3)
+            {
                 condition = isAscending ? (records[j].population > records[j + 1].population) : (records[j].population < records[j + 1].population);
             }
 
             // Swap the records if the condition is met
-            if (condition) {
+            if (condition)
+            {
                 Record temp = records[j];
                 records[j] = records[j + 1];
                 records[j + 1] = temp;
@@ -693,7 +317,8 @@ void sortRecords() {
 
     // Reopen the file for writing the sorted records
     file = fopen(filename, "wb");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error opening file for writing.\n");
         free(records);
         return;
@@ -884,8 +509,8 @@ void deleteRecord()
     fclose(file);
 
     // Изменяем вывод так, чтобы индексация начиналась с 1
-    printf("Enter the index of the record to delete (1 to %d): ", count);  // Индексация от 1
-    while (scanf("%d", &index) != 1 || index < 1 || index > count)  // Ввод индекса от 1 до count
+    printf("Enter the index of the record to delete (1 to %d): ", count); // Индексация от 1
+    while (scanf("%d", &index) != 1 || index < 1 || index > count)        // Ввод индекса от 1 до count
     {
         printf("Invalid input. Index must be between 1 and %d. Try again: ", count);
         fflush(stdin);
@@ -893,7 +518,7 @@ void deleteRecord()
     fflush(stdin);
 
     // Преобразуем индекс пользователя в индекс для массива (индексация с 0)
-    index--;  // Уменьшаем на 1, чтобы работать с индексами массива (начиная с 0)
+    index--; // Уменьшаем на 1, чтобы работать с индексами массива (начиная с 0)
 
     for (int i = index; i < count - 1; i++)
     {
@@ -914,7 +539,7 @@ void deleteRecord()
     fclose(file);
     free(records);
 
-    printf("Record at index %d deleted successfully from file '%s'.\n", index + 1, filename);  // Выводим индекс с 1
+    printf("Record at index %d deleted successfully from file '%s'.\n", index + 1, filename); // Выводим индекс с 1
 }
 
 void menu()
@@ -936,7 +561,8 @@ void menu()
         printf("0. Exit\n");
 
         int validChoice;
-        do {
+        do
+        {
             printf("Enter your choice: ");
             validChoice = scanf("%d", &choice);
             if (validChoice != 1)
