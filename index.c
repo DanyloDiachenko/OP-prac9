@@ -98,20 +98,17 @@ void readFile() {
             continue;
         }
 
-        // Удаление символа новой строки
         size_t len = strlen(filename);
         if (len > 0 && filename[len - 1] == '\n') {
             filename[len - 1] = '\0';
         }
 
-        // Проверка имени файла
         valid = isValidFileName(filename);
         if (!valid) {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
-        // Открытие файла
         file = fopen(filename, "rb");
         if (file == NULL) {
             printf("Error opening file or file does not exist: %s\n", strerror(errno));
@@ -119,17 +116,16 @@ void readFile() {
         }
     } while (!valid);
 
-    // Проверка сигнатуры
     const char *expectedSignature = "MY_SIGNATURE";
     const int signatureLength = strlen(expectedSignature);
-    char signature[signatureLength + 1]; // +1 для '\0'
+    char signature[signatureLength + 1];
 
     if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
         printf("Error reading file signature.\n");
         fclose(file);
         return;
     }
-    signature[signatureLength] = '\0'; // Завершающий символ
+    signature[signatureLength] = '\0';
 
     if (strcmp(signature, expectedSignature) != 0) {
         printf("Invalid file format.\n");
@@ -137,7 +133,6 @@ void readFile() {
         return;
     }
 
-    // Чтение записей
     Record record;
     printf("\nRecords in file:\n");
     while (fread(&record, sizeof(Record), 1, file) == 1) {
@@ -153,83 +148,72 @@ void readFile() {
     fclose(file);
 }
 
-void addRecord()
-{
+void addRecord() {
     char filename[256];
     bool valid;
     FILE *file;
 
-    do
-    {
+    do {
         printf("Enter the name of the file to add record: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
+        if (fgets(filename, sizeof(filename), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
         size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
+        if (len > 0 && filename[len - 1] == '\n') {
             filename[len - 1] = '\0';
         }
 
         valid = isValidFileName(filename);
-        if (!valid)
-        {
+        if (!valid) {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
             continue;
         }
 
         file = fopen(filename, "rb+");
-        if (file == NULL)
-        {
+        if (file == NULL) {
             printf("Error opening file: %s\n", strerror(errno));
             valid = false;
             continue;
         }
 
-        const int signatureLength = 12;
-        char signature[signatureLength];
-        if (fread(signature, sizeof(char), signatureLength - 1, file) != signatureLength - 1)
-        {
-            printf("Invalid file format.\n");
-            fclose(file);
-            return;
-        }
-        signature[signatureLength - 1] = '\0';
+        const char *expectedSignature = "MY_SIGNATURE";
+        const int signatureLength = strlen(expectedSignature);
+        char signature[signatureLength + 1];
 
-        if (strcmp(signature, "MY_SIGNATURE") != 0)
-        {
+        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength) {
+            printf("Error reading file signature.\n");
+            fclose(file);
+            continue;
+        }
+        signature[signatureLength] = '\0';
+
+        if (strcmp(signature, expectedSignature) != 0) {
             printf("Invalid file format.\n");
             fclose(file);
-            return;
+            continue;
         }
 
         fseek(file, 0, SEEK_END);
     } while (!valid);
 
     Record record;
-
-    do
-    {
+    do {
         printf("Enter name of the region (max 50 characters): ");
-        if (fgets(record.name, sizeof(record.name), stdin) == NULL)
-        {
+        if (fgets(record.name, sizeof(record.name), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             valid = false;
             continue;
         }
 
         size_t len = strlen(record.name);
-        if (len > 0 && record.name[len - 1] == '\n')
-        {
+        if (len > 0 && record.name[len - 1] == '\n') {
             record.name[len - 1] = '\0';
         }
 
         printf("Enter area: ");
-        if (scanf("%f", &record.area) != 1 || record.area < 0)
-        {
+        if (scanf("%f", &record.area) != 1 || record.area < 0) {
             printf("Invalid input. Area must be a positive number.\n");
             valid = false;
             fflush(stdin);
@@ -238,8 +222,7 @@ void addRecord()
         fflush(stdin);
 
         printf("Enter population: ");
-        if (scanf("%f", &record.population) != 1 || record.population < 0)
-        {
+        if (scanf("%f", &record.population) != 1 || record.population < 0) {
             printf("Invalid input. Population must be a positive number.\n");
             valid = false;
             fflush(stdin);
@@ -252,6 +235,7 @@ void addRecord()
 
     fwrite(&record, sizeof(Record), 1, file);
     printf("Record added successfully.\n");
+
     fclose(file);
 }
 
