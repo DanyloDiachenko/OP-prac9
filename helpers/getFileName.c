@@ -1,6 +1,6 @@
-bool getFileName(char *filename, size_t size, const char *prompt)
+bool getFileName(char *filename, size_t size, char message[])
 {
-    printf("%s", prompt);
+    printf("%s", message);
     if (fgets(filename, size, stdin) == NULL)
     {
         printf("Error reading input. Please try again.\n");

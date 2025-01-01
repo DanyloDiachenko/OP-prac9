@@ -36,16 +36,26 @@ void deleteRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
-    int index;
-    printf("Enter the index of the record to delete (1 to %d): ", count);
-    while (scanf("%d", &index) != 1 || index < 1 || index > count)
+    int index = 0;
+    bool validInput = false;
+
+    do
     {
-        printf("Invalid input. Index must be between 1 and %d. Try again: ", count);
-        fflush(stdin);
-    }
-    fflush(stdin);
+        printf("Enter the index of the record to delete (1 to %d): ", count);
+        if (scanf("%d", &index) == 1 && index >= 1 && index <= count)
+        {
+            fflush(stdin);
+            validInput = true;
+        }
+        else
+        {
+            printf("Invalid input. Index must be between 1 and %d. Try again.\n", count);
+            fflush(stdin);
+        }
+    }while(!validInput);
 
     index--;
+
     for (int i = index; i < count - 1; i++)
     {
         records[i] = records[i + 1];
