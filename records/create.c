@@ -10,7 +10,7 @@ void createRecord()
         if (fgets(filename, sizeof(filename), stdin) == NULL)
         {
             printf("Error reading input. Please try again.\n");
-            continue;
+            return;
         }
 
         size_t len = strlen(filename);
@@ -23,15 +23,14 @@ void createRecord()
         if (!valid)
         {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
+            return;
         }
 
         file = fopen(filename, "rb+");
         if (file == NULL)
         {
             printf("Error opening file: %s\n", strerror(errno));
-            valid = false;
-            continue;
+            return;
         }
 
         int signatureLength = strlen(MY_SIGNATURE);
@@ -39,9 +38,9 @@ void createRecord()
 
         if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
         {
-            printf("Error reading file signature.\n");
+            printf("Invalid file format or file is corrupted.\n");
             fclose(file);
-            continue;
+            return;
         }
         signature[signatureLength] = '\0';
 
@@ -49,7 +48,7 @@ void createRecord()
         {
             printf("Invalid file format.\n");
             fclose(file);
-            continue;
+            return;
         }
 
         fseek(file, 0, SEEK_END);
