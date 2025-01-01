@@ -38,17 +38,22 @@ void deleteFile()
             continue;
         }
 
-        size_t signatureLength = strlen(MY_SIGNATURE);
-        char fileSignature[signatureLength + 1];
-        memset(fileSignature, 0, sizeof(fileSignature));
+        int signatureLength = strlen(MY_SIGNATURE);
+        char signature[signatureLength + 1];
 
-        fread(fileSignature, sizeof(char), signatureLength, file);
-        fclose(file);
-
-        if (strcmp(fileSignature, MY_SIGNATURE) != 0)
+        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
         {
-            printf("File '%s' is not recognized as a valid file. It will not be deleted.\n", filename);
-            continue;
+            printf("Invalid file format or file is corrupted.\n");
+            fclose(file);
+            return;
+        }
+        signature[signatureLength] = '\0';
+
+        if (strcmp(signature, MY_SIGNATURE) != 0)
+        {
+            printf("Invalid file format.\n");
+            fclose(file);
+            return;
         }
 
         if (remove(filename) == 0)
