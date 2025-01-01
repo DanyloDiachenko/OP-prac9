@@ -1,100 +1,43 @@
 void readSingleRecord()
 {
     char filename[256];
-    bool valid;
-    int index;
+    FILE *file;
 
-    do
+    if (!getFileName(filename, sizeof(filename), "Enter the name of the file to read: "))
     {
-        printf("Enter the name of the file to read: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
-            printf("Error reading input. Please try again.\n");
-            continue;
-        }
-
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
-            filename[len - 1] = '\0';
-        }
-
-        valid = validateFileName(filename);
-        if (!valid)
-        {
-            printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-            continue;
-        }
-
-        FILE *file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            printf("Error opening file: %s\n", strerror(errno));
-            valid = false;
-            continue;
-        }
-
-        int signatureLength = strlen(MY_SIGNATURE);
-        char signature[signatureLength + 1];
-
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
-        {
-            printf("Invalid file format or file is corrupted.\n");
-            fclose(file);
-            valid = false;
-            continue;
-        }
-
-        signature[signatureLength] = '\0';
-
-        if (strcmp(signature, MY_SIGNATURE) != 0)
-        {
-            printf("Invalid file format.\n");
-            fclose(file);
-            valid = false;
-            continue;
-        }
-
-        fclose(file);
-    } while (!valid);
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        printf("Error opening file: %s\n", strerror(errno));
         return;
     }
 
-    fseek(file, 12, SEEK_SET);
+    if (!openAndValidateFile(filename, &file))
+    {
+        return;
+    }
 
+    int signatureLength = strlen(MY_SIGNATURE);
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);
-    long recordCount = (fileSize - 12) / sizeof(Record);
+    long recordCount = (fileSize - signatureLength) / sizeof(Record);
+    if (recordCount <= 0)
+    {
+        printf("The file contains no records.\n");
+        fclose(file);
+        return;
+    }
 
     printf("The file contains %ld records.\n", recordCount);
 
-    do
+    int index;
+    if (!getRecordIndex(&index, recordCount, "Enter the index of the record to read"))
     {
-        printf("Enter the index of the record to read (1-%ld): ", recordCount);
-        if (scanf("%d", &index) != 1 || index < 1 || index > recordCount)
-        {
-            printf("Invalid input. Index must be a non-negative integer between 1 and %ld.\n", recordCount);
-            fflush(stdin);
-            valid = false;
-            continue;
-        }
-        fflush(stdin);
-
-        valid = true;
-    } while (!valid);
-
-    index -= 1;
+        fclose(file);
+        return;
+    }
 
     Record record;
-    fseek(file, 12 + index * sizeof(Record), SEEK_SET);
+    fseek(file, signatureLength + (index - 1) * sizeof(Record), SEEK_SET);
     if (fread(&record, sizeof(Record), 1, file) == 1)
     {
-        printf("\nRecord at index %d:\n", index + 1);
+        printf("\nRecord at index %d:\n", index);
         printf("Name: %s\nArea: %.2f\nPopulation: %.2f\n", record.name, record.area, record.population);
     }
     else
