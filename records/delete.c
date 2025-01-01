@@ -1,53 +1,19 @@
 void deleteRecord()
 {
     char filename[256];
-    int index;
     FILE *file;
 
-    printf("Enter the name of the file to delete a record from: ");
-    if (fgets(filename, sizeof(filename), stdin) == NULL)
+    if (!getFileName(filename, sizeof(filename), "Enter the name of the file to delete a record from: "))
     {
-        printf("Error reading input. Operation aborted.\n");
         return;
     }
 
-    size_t len = strlen(filename);
-    if (len > 0 && filename[len - 1] == '\n')
+    if (!openAndValidateFile(filename, &file))
     {
-        filename[len - 1] = '\0';
-    }
-
-    if (!validateFileName(filename))
-    {
-        printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-        return;
-    }
-
-    file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        printf("Error opening file or file does not exist.\n");
         return;
     }
 
     int signatureLength = strlen(MY_SIGNATURE);
-    char signature[signatureLength + 1];
-
-    if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
-    {
-        printf("Invalid file format or file is corrupted.\n");
-        fclose(file);
-        return;
-    }
-    signature[signatureLength] = '\0';
-
-    if (strcmp(signature, MY_SIGNATURE) != 0)
-    {
-        printf("Invalid file format.\n");
-        fclose(file);
-        return;
-    }
-
     fseek(file, 0, SEEK_END);
     int count = (ftell(file) - signatureLength) / sizeof(Record);
     if (count == 0)
@@ -56,6 +22,7 @@ void deleteRecord()
         fclose(file);
         return;
     }
+
     fseek(file, signatureLength, SEEK_SET);
 
     Record *records = (Record *)malloc(count * sizeof(Record));
@@ -69,6 +36,7 @@ void deleteRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
+    int index;
     printf("Enter the index of the record to delete (1 to %d): ", count);
     while (scanf("%d", &index) != 1 || index < 1 || index > count)
     {
@@ -78,14 +46,12 @@ void deleteRecord()
     fflush(stdin);
 
     index--;
-
     for (int i = index; i < count - 1; i++)
     {
         records[i] = records[i + 1];
     }
 
     file = fopen(filename, "wb");
-
     if (file == NULL)
     {
         printf("Error opening file for writing.\n");
