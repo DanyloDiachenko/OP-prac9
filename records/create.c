@@ -30,6 +30,7 @@ void createRecord()
         if (file == NULL)
         {
             printf("Error opening file: %s\n", strerror(errno));
+            fclose(file);
             return;
         }
 
