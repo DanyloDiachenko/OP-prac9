@@ -20,7 +20,7 @@ void readFile()
             continue;
         }
 
-        if (!checkFileSignature(file))
+        if (!validateFileSignature(file))
         {
             fclose(file);
             return;

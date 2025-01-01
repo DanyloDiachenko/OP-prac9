@@ -2,6 +2,7 @@
     "files.associations": {
         "*.svg": "javascriptreact",
         "includes.h": "c",
-        "constants.h": "c"
+        "constants.h": "c",
+        "stdbool.h": "c"
     }
 }

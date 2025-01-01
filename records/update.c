@@ -15,7 +15,7 @@ void updateRecord()
 
         filename[strcspn(filename, "\n")] = '\0';
 
-        valid = validateFileName(filename);
+        valid = validateCreatingFileName(filename);
         if (!valid)
         {
             printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");

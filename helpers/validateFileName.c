@@ -12,7 +12,7 @@ bool validateFileName(char *filename, size_t size)
         filename[len - 1] = '\0';
     }
 
-    if (!validateFileName(filename))
+    if (!validateCreatingFileName(filename))
     {
         printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
         return false;

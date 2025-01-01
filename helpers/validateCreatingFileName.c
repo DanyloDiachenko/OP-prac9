@@ -1,4 +1,4 @@
-bool validateFileName(char *filename)
+bool validateCreatingFileName(char *filename)
 {
     if (strlen(filename) == 0 || strlen(filename) > 255)
         return 0;

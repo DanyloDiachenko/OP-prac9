@@ -19,6 +19,8 @@ int getSortOrder();
 bool openAndValidateFile(const char *filename, FILE **file);
 bool validateFileExisting(const char *filename);
 bool validateFileName(char *filename, size_t size);
+bool validateCreatingFileName(char *filename);
 bool validateFileSignature(FILE *file);
+void getRecordIndex(int *index, int recordCount, char message[]);
 
 #endif // FUNCTIONS_H

@@ -27,11 +27,7 @@ void readSingleRecord()
     printf("The file contains %ld records.\n", recordCount);
 
     int index;
-    if (!getRecordIndex(&index, recordCount, "Enter the index of the record to read"))
-    {
-        fclose(file);
-        return;
-    }
+    getRecordIndex(&index, recordCount, "Enter the index of the record to read");
 
     Record record;
     fseek(file, signatureLength + (index - 1) * sizeof(Record), SEEK_SET);
