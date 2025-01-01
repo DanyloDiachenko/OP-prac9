@@ -1,31 +1,14 @@
 void deleteFile()
 {
     char filename[256];
-    bool valid;
 
-    do
+    while (true)
     {
         printf("Enter the name of the file to delete: ");
-        if (fgets(filename, sizeof(filename), stdin) == NULL)
-        {
-            printf("Error reading input. Please try again.\n");
+        if (!validateAndSanitizeFileName(filename, sizeof(filename)))
             continue;
-        }
 
-        size_t len = strlen(filename);
-        if (len > 0 && filename[len - 1] == '\n')
-        {
-            filename[len - 1] = '\0';
-        }
-
-        valid = validateFileName(filename);
-        if (!valid)
-        {
-            printf("Invalid file name. Only letters, numbers, and dots are allowed.\n");
-            continue;
-        }
-
-        if (access(filename, F_OK) != 0)
+        if (!validateFileExisting(filename))
         {
             printf("File '%s' does not exist.\n", filename);
             continue;
@@ -38,23 +21,13 @@ void deleteFile()
             continue;
         }
 
-        int signatureLength = strlen(MY_SIGNATURE);
-        char signature[signatureLength + 1];
-
-        if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
+        if (!validateFileSignature(file))
         {
-            printf("Invalid file format or file is corrupted.\n");
             fclose(file);
             return;
         }
-        signature[signatureLength] = '\0';
 
-        if (strcmp(signature, MY_SIGNATURE) != 0)
-        {
-            printf("Invalid file format.\n");
-            fclose(file);
-            return;
-        }
+        fclose(file);
 
         if (remove(filename) == 0)
         {
@@ -65,6 +38,6 @@ void deleteFile()
             printf("Error deleting file: %s\n", strerror(errno));
         }
 
-        valid = true;
-    } while (!valid);
+        break;
+    }
 }
