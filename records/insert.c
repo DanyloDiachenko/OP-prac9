@@ -4,50 +4,17 @@ void insertRecord()
     Record newRecord;
     FILE *file;
 
-    printf("Enter the name of the file to insert the record into: ");
-    if (fgets(filename, sizeof(filename), stdin) == NULL)
+    if (!getFileName(filename, sizeof(filename), "Enter the name of the file to insert the record into: "))
     {
-        printf("Error reading input. Operation aborted.\n");
         return;
     }
 
-    size_t len = strlen(filename);
-    if (len > 0 && filename[len - 1] == '\n')
+    if (!openAndValidateFile(filename, &file))
     {
-        filename[len - 1] = '\0';
-    }
-
-    if (!validateFileName(filename))
-    {
-        printf("Invalid file name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
-        return;
-    }
-
-    file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        printf("Error opening file or file does not exist.\n");
         return;
     }
 
     int signatureLength = strlen(MY_SIGNATURE);
-    char signature[signatureLength + 1];
-
-    if (fread(signature, sizeof(char), signatureLength, file) != signatureLength)
-    {
-        printf("Invalid file format or file is corrupted.\n");
-        fclose(file);
-        return;
-    }
-    signature[signatureLength] = '\0';
-
-    if (strcmp(signature, MY_SIGNATURE) != 0)
-    {
-        printf("Invalid file format.\n");
-        fclose(file);
-        return;
-    }
-
     fseek(file, 0, SEEK_END);
     int count = (ftell(file) - signatureLength) / sizeof(Record);
     fseek(file, signatureLength, SEEK_SET);
@@ -63,32 +30,9 @@ void insertRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
-    printf("Enter name of the region (max %d characters): ", MAX_RECORD_NAME_SIZE);
-    while (scanf("%49s", newRecord.name) != 1 || strlen(newRecord.name) > MAX_RECORD_NAME_SIZE)
-    {
-        printf("Invalid input. Name should be at most %d characters. Try again: ", MAX_RECORD_NAME_SIZE);
-        fflush(stdin);
-    }
-    fflush(stdin);
+    getRecordDetails(&newRecord);
 
-    printf("Enter area (positive number): ");
-    while (scanf("%f", &newRecord.area) != 1 || newRecord.area <= 0 || newRecord.area > MAX_RECORD_AREA)
-    {
-        printf("Invalid input. Area must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_AREA);
-        fflush(stdin);
-    }
-    fflush(stdin);
-
-    printf("Enter population (positive number): ");
-    while (scanf("%f", &newRecord.population) != 1 || newRecord.population <= 0 || newRecord.population > MAX_RECORD_POPULATION)
-    {
-        printf("Invalid input. Population must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_POPULATION);
-        fflush(stdin);
-    }
-    fflush(stdin);
-
-    int i;
-    for (i = count - 1; i >= 0 && strcmp(records[i].name, newRecord.name) > 0; i--)
+    for (int i = count - 1; i >= 0 && strcmp(records[i].name, newRecord.name) > 0; i--)
     {
         records[i + 1] = records[i];
     }
