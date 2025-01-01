@@ -17,7 +17,6 @@ void getRecordDetails(Record *record);
 int getSortField();
 int getSortOrder();
 bool openAndValidateFile(const char *filename, FILE **file);
-bool validateFileName(char *filename);
 bool validateFileExisting(const char *filename);
 bool validateFileName(char *filename, size_t size);
 bool validateFileSignature(FILE *file);

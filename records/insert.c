@@ -32,7 +32,8 @@ void insertRecord()
 
     getRecordDetails(&newRecord);
 
-    for (int i = count - 1; i >= 0 && strcmp(records[i].name, newRecord.name) > 0; i--)
+    int i = 0;
+    for (i = count - 1; i >= 0 && strcmp(records[i].name, newRecord.name) > 0; i--)
     {
         records[i + 1] = records[i];
     }
