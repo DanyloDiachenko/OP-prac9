@@ -2,16 +2,20 @@ void createFile()
 {
     char filename[256];
     FILE *file;
+    bool validity;
 
-    while (true)
+    do
     {
         printf("Enter the name of the file to create (letters, numbers, dots, underscores, and hyphens only) including '.dat' extension: ");
-        if (!validateAndSanitizeFileName(filename, sizeof(filename)))
+        validity = validateFileName(filename, sizeof(filename));
+
+        if (!validity)
             continue;
 
         if (validateFileExisting(filename))
         {
             printf("File '%s' already exists. Please choose a different name.\n", filename);
+            validity = false;
             continue;
         }
 
@@ -19,19 +23,21 @@ void createFile()
         if (file == NULL)
         {
             printf("Error creating file: %s\n", strerror(errno));
+            validity = false;
             continue;
         }
 
         if (fwrite(MY_SIGNATURE, sizeof(char), strlen(MY_SIGNATURE), file) != strlen(MY_SIGNATURE))
         {
             printf("Error writing to file.\n");
+            validity = false;
         }
         else
         {
             printf("File '%s' created successfully.\n", filename);
+            validity = true;
         }
 
         fclose(file);
-        break;
-    }
+    } while (!validity);
 }

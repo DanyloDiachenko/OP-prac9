@@ -2,17 +2,21 @@ void readFile()
 {
     char filename[256];
     FILE *file;
+    bool validity;
 
-    while (true)
+    do
     {
         printf("Enter the name of the file to read: ");
-        if (!validateAndSanitizeFileName(filename, sizeof(filename)))
+        validity = validateFileName(filename, sizeof(filename));
+
+        if (!validity)
             continue;
 
         file = fopen(filename, "rb");
         if (file == NULL)
         {
             printf("Error opening file or file does not exist: %s\n", strerror(errno));
+            validity = false;
             continue;
         }
 
@@ -39,6 +43,6 @@ void readFile()
         }
 
         fclose(file);
-        break;
-    }
+        validity = true;
+    } while (!validity);
 }
