@@ -56,7 +56,15 @@ void updateRecord()
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);
     long recordCount = (fileSize - 12) / sizeof(Record);
-    printf("The file contains %ld records.\n", recordCount);
+
+    if (recordCount == 0)
+    {
+        printf("The file contains no records. Nothing to update.\n");
+        fclose(file);
+        return;
+    } else {
+        printf("The file contains %ld records.\n", recordCount);
+    }
 
     do
     {
