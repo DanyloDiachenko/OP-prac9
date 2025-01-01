@@ -1,5 +1,3 @@
-#include "./functions.h"
-
 void menu()
 {
     int choice;
@@ -19,18 +17,24 @@ void menu()
         printf("0. Exit\n");
 
         int validChoice;
+        bool validInput = false;
+
         do
         {
             printf("Enter your choice: ");
             validChoice = getchar();
-            if (validChoice != 1)
-            {
-                printf("Invalid input. Please enter a number.\n");
-                fflush(stdin);
-                continue;
-            }
             fflush(stdin);
-        } while (validChoice != 1);
+
+            if (validChoice >= '0' && validChoice <= '9')
+            {
+                validInput = true;
+                choice = validChoice - '0';
+            }
+            else
+            {
+                printf("Invalid input. Please enter a number between 0 and 9.\n");
+            }
+        } while (!validInput);
 
         switch (choice)
         {
@@ -47,30 +51,20 @@ void menu()
             createRecord();
             break;
         case 5:
-        {
             readSingleRecord();
             break;
-        }
         case 6:
-        {
             updateRecord();
             break;
-        }
         case 7:
-        {
             sortRecords();
             break;
-        }
         case 8:
-        {
             insertRecord();
             break;
-        }
         case 9:
-        {
             deleteRecord();
             break;
-        }
         case 0:
             printf("Exiting program.\n");
             break;
