@@ -16,7 +16,16 @@
 #include "./files/create.c"
 #include "./files/read.c"
 #include "./files/delete.c"
-#include "./files/validateName.c"
+
+#include "./helpers/getFileName.c"
+#include "./helpers/getRecordData.c"
+#include "./helpers/getSortField.c"
+#include "./helpers/getSortOrder.c"
+#include "./helpers/openAndValidateFile.c"
+#include "./helpers/validateCreatingFileName.c"
+#include "./helpers/validateFileExisting.c"
+#include "./helpers/validateFileName.c"
+#include "./helpers/validateFileSignature.c"
 
 #include "./records/create.c"
 #include "./records/insert.c"
