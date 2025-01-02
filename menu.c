@@ -38,34 +38,34 @@ void menu()
 
         switch (choice)
         {
-        case 1:
+        case MENU_CREATE_FILE:
             createFile();
             break;
-        case 2:
+        case MENU_READ_FILE:
             readFile();
             break;
-        case 3:
+        case MENU_DELETE_FILE:
             deleteFile();
             break;
-        case 4:
+        case MENU_ADD_RECORD:
             createRecord();
             break;
-        case 5:
+        case MENU_READ_SINGLE_RECORD:
             readSingleRecord();
             break;
-        case 6:
+        case MENU_UPDATE_RECORD:
             updateRecord();
             break;
-        case 7:
+        case MENU_SORT_RECORDS:
             sortRecords();
             break;
-        case 8:
+        case MENU_INSERT_RECORD:
             insertRecord();
             break;
-        case 9:
+        case MENU_DELETE_RECORD:
             deleteRecord();
             break;
-        case 0:
+        case MENU_EXIT:
             printf("Exiting program.\n");
             break;
         default:

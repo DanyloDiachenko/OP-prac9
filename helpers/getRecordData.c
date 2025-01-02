@@ -26,7 +26,7 @@ void getRecordDetails(Record *record)
     validInput = false;
     do
     {
-        printf("Enter area (positive number): ");
+        printf("Enter area (positive number and less than or equal to %.0ef): ", MAX_RECORD_AREA);
         if (scanf("%f", &record->area) == 1 && record->area > 0 && record->area <= MAX_RECORD_AREA)
         {
             fflush(stdin);
@@ -42,7 +42,7 @@ void getRecordDetails(Record *record)
     validInput = false;
     do
     {
-        printf("Enter population (positive number): ");
+        printf("Enter population (positive number and less than or equal to %.0e): ", MAX_RECORD_POPULATION);
         if (scanf("%f", &record->population) == 1 && record->population > 0 && record->population <= MAX_RECORD_POPULATION)
         {
             fflush(stdin);

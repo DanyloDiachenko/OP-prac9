@@ -17,6 +17,13 @@ void insertRecord()
     int signatureLength = strlen(MY_SIGNATURE);
     fseek(file, 0, SEEK_END);
     int count = (ftell(file) - signatureLength) / sizeof(Record);
+    if (count <= 0)
+    {
+        printf("The file contains no records.\n");
+        fclose(file);
+        return;
+    }
+
     fseek(file, signatureLength, SEEK_SET);
 
     Record *records = (Record *)malloc((count + 1) * sizeof(Record));
@@ -30,11 +37,18 @@ void insertRecord()
     fread(records, sizeof(Record), count, file);
     fclose(file);
 
+    int sortField = getSortField();
+    int isAscending = getSortOrder();
+
     getRecordDetails(&newRecord);
 
-    int i = 0;
-    for (i = count - 1; i >= 0 && strcmp(records[i].name, newRecord.name) > 0; i--)
+    int i;
+    for (i = count - 1; i >= 0; i--)
     {
+        if (compareRecords(&records[i], &newRecord, sortField, isAscending) <= 0)
+        {
+            break;
+        }
         records[i + 1] = records[i];
     }
     records[i + 1] = newRecord;

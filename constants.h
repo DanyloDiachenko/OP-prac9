@@ -16,4 +16,18 @@ typedef struct
     float population;
 } Record;
 
+typedef enum
+{
+    MENU_EXIT = 0,
+    MENU_CREATE_FILE,
+    MENU_READ_FILE,
+    MENU_DELETE_FILE,
+    MENU_ADD_RECORD,
+    MENU_READ_SINGLE_RECORD,
+    MENU_UPDATE_RECORD,
+    MENU_SORT_RECORDS,
+    MENU_INSERT_RECORD,
+    MENU_DELETE_RECORD
+} MenuOption;
+
 #endif // CONSTANTS_H
