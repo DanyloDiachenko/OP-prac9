@@ -7,6 +7,8 @@
 #define MAX_RECORD_AREA 1e9
 #define MAX_RECORD_POPULATION 1e12
 
+#define MAX_FILE_NAME_LENGTH 256
+
 typedef struct
 {
     char name[MAX_RECORD_NAME_SIZE];

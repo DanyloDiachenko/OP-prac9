@@ -1,6 +1,6 @@
 void insertRecord()
 {
-    char filename[256];
+    char filename[MAX_FILE_NAME_LENGTH];
     Record newRecord;
     FILE *file;
 

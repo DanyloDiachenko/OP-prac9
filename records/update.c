@@ -1,6 +1,6 @@
 void updateRecord()
 {
-    char filename[256];
+    char filename[MAX_FILE_NAME_LENGTH];
     bool valid;
     int index;
 

@@ -1,6 +1,6 @@
 void deleteFile()
 {
-    char filename[256];
+    char filename[MAX_FILE_NAME_LENGTH];
     bool validity;
 
     do

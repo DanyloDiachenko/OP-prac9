@@ -1,6 +1,6 @@
 void readSingleRecord()
 {
-    char filename[256];
+    char filename[MAX_FILE_NAME_LENGTH];
     FILE *file;
 
     if (!getFileName(filename, sizeof(filename), "Enter the name of the file to read: "))

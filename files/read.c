@@ -1,6 +1,6 @@
 void readFile()
 {
-    char filename[256];
+    char filename[MAX_FILE_NAME_LENGTH];
     FILE *file;
     bool validity;
 
