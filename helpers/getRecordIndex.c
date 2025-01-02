@@ -18,8 +18,8 @@ void getRecordIndex(int *index, int recordCount, char message[])
         }
         else
         {
-            printf("Invalid input. Please enter a number between 1 and %d.\n", recordCount);
             fflush(stdin);
+            printf("Invalid input. Please enter a number between 1 and %d.\n", recordCount);
         }
     } while (!validInput);
 }

@@ -34,8 +34,8 @@ void getRecordDetails(Record *record)
         }
         else
         {
-            printf("Invalid input. Area must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_AREA);
             fflush(stdin);
+            printf("Invalid input. Area must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_AREA);
         }
     } while (!validInput);
 
@@ -50,8 +50,8 @@ void getRecordDetails(Record *record)
         }
         else
         {
-            printf("Invalid input. Population must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_POPULATION);
             fflush(stdin);
+            printf("Invalid input. Population must be a positive number and less than or equal to %.2f. Try again: ", MAX_RECORD_POPULATION);
         }
     } while (!validInput);
 }

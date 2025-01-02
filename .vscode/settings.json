@@ -3,6 +3,7 @@
         "*.svg": "javascriptreact",
         "includes.h": "c",
         "constants.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "cstdio": "c"
     }
 }

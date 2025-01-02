@@ -6,10 +6,6 @@ void deleteFile()
     do
     {
         printf("Enter the name of the file to delete: ");
-        validity = validateFileName(filename, sizeof(filename));
-
-        if (!validity)
-            continue;
 
         if (!validateFileExisting(filename))
         {

@@ -30,4 +30,11 @@ typedef enum
     MENU_DELETE_RECORD
 } MenuOption;
 
+typedef enum
+{
+    SORT_NAME = 1,
+    SORT_AREA,
+    SORT_POPULATION
+}
+
 #endif // CONSTANTS_H

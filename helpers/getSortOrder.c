@@ -1,7 +1,7 @@
 int getSortOrder()
 {
     int order;
-    bool isValid = false;
+    bool validity = false;
 
     printf("Choose the sort order:\n");
     printf("1 - Ascending\n");
@@ -13,15 +13,15 @@ int getSortOrder()
         if (scanf("%d", &order) == 1 && (order == 1 || order == 2))
         {
             fflush(stdin);
-            isValid = true;
+            validity = true;
         }
         else
         {
             printf("Invalid input. Please enter 1 or 2.\n");
             fflush(stdin);
-            isValid = false;
+            validity = false;
         }
-    } while (!isValid);
-    
+    } while (!validity);
+
     return (order == 1);
 }

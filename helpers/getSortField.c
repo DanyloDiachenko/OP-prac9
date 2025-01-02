@@ -1,7 +1,7 @@
 int getSortField()
 {
     int field;
-    bool isValid = false;
+    bool validity = false;
 
     printf("Choose the field to sort by:\n");
     printf("1 - Name\n");
@@ -14,15 +14,15 @@ int getSortField()
         if (scanf("%d", &field) == 1 && field >= 1 && field <= 3)
         {
             fflush(stdin);
-            isValid = true;
+            validity = true;
         }
         else
         {
             printf("Invalid input. Please enter 1, 2, or 3.\n");
             fflush(stdin);
-            isValid = false;
+            validity = false;
         }
-    } while (!isValid);
+    } while (!validity);
 
     return field;
 }
