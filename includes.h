@@ -28,6 +28,7 @@
 #include "./helpers/validateFileSignature.c"
 #include "./helpers/getRecordIndex.c"
 #include "./helpers/compareRecords.c"
+#include "./helpers/sortRecordArray.c"
 
 #include "./records/create.c"
 #include "./records/insert.c"

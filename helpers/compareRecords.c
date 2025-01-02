@@ -16,6 +16,5 @@ int compareRecords(const void *a, const void *b, int sortField, int isAscending)
         result = (recA->population > recB->population) - (recA->population < recB->population);
         break;
     }
-
     return isAscending ? result : -result;
 }
