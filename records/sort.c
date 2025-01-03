@@ -3,8 +3,10 @@ void sortRecords()
     char filename[MAX_FILE_NAME_LENGTH];
     FILE *file;
 
-    printf("Enter the name of the file to sort: ");
-    scanf("%s", filename);
+    if (!getFileName(filename, sizeof(filename), "Enter the name of the file to sort: "))
+    {
+        return;
+    }
 
     file = fopen(filename, "rb");
     if (!file)

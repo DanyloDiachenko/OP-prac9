@@ -13,7 +13,7 @@ void insertRecord();
 void deleteRecord();
 
 bool getFileName(char *filename, size_t size, char message[]);
-int compareRecords(const void *a, const void *b, int sortField, int isAscending);
+int compareRecords(void *a, void *b, int sortField, int isAscending);
 void sortRecordArray(Record *records, int count, int sortField, int isAscending);
 void getRecordDetails(Record *record);
 int getSortField();

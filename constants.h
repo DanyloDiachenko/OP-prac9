@@ -35,6 +35,6 @@ typedef enum
     SORT_NAME = 1,
     SORT_AREA,
     SORT_POPULATION
-}
+} SortFields;
 
 #endif // CONSTANTS_H
